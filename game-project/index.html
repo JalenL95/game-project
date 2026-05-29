@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cosa Nostra: A Generational Saga</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #11100f;
+      --panel: rgba(38, 35, 31, 0.92);
+      --panel-2: rgba(20, 19, 18, 0.84);
+      --line: #5b4930;
+      --gold: #d8b56b;
+      --gold-2: #9c7439;
+      --red: #ca3f3f;
+      --green: #5fd089;
+      --blue: #60a5fa;
+      --text: #eee7dc;
+      --muted: #a99f91;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Lato", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(216, 181, 107, 0.13), transparent 28rem),
+        radial-gradient(circle at 80% 10%, rgba(117, 20, 20, 0.18), transparent 30rem),
+        linear-gradient(rgba(5, 5, 5, 0.84), rgba(5, 5, 5, 0.92)),
+        url("https://www.transparenttextures.com/patterns/dark-denim-3.png"),
+        var(--bg);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.92);
+      z-index: 20;
+    }
+
+    button, input, select { font: inherit; }
+    button { border: 0; }
+
+    .shell {
+      width: min(1500px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      border: 1px solid rgba(216, 181, 107, 0.45);
+      border-radius: 24px;
+      padding: 28px;
+      background:
+        linear-gradient(120deg, rgba(0, 0, 0, 0.72), rgba(28, 22, 17, 0.84)),
+        url("https://images.unsplash.com/photo-1519608487953-e999c86e7455?q=80&w=1800&auto=format&fit=crop");
+      background-size: cover;
+      background-position: center;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid rgba(216, 181, 107, 0.35);
+      padding-bottom: 22px;
+    }
+
+    h1, h2, h3, .cinzel {
+      font-family: "Cinzel", Georgia, serif;
+      letter-spacing: 0.08em;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 7vw, 5.4rem);
+      color: #ffe8a8;
+      line-height: 0.96;
+      text-shadow: 0 6px 28px rgba(0, 0, 0, 0.8);
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.28em;
+      font-weight: 900;
+      font-size: 0.78rem;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      color: var(--text);
+      background: linear-gradient(#544d45, #302b27);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 10px 14px;
+      min-height: 42px;
+      cursor: pointer;
+      font-weight: 900;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+      transition: transform 0.16s ease, filter 0.16s ease, opacity 0.16s ease;
+    }
+
+    .btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.12); }
+    .btn:disabled { cursor: not-allowed; opacity: 0.45; }
+    .btn.gold { color: #17120c; background: linear-gradient(#f2d58b, #b9893f); }
+    .btn.red { background: linear-gradient(#cf4a4a, #842222); }
+    .btn.blue { background: linear-gradient(#3b82f6, #1d4ed8); }
+    .btn.green { color: #09130d; background: linear-gradient(#7ee4a1, #38a364); }
+    .btn.ghost { background: rgba(0, 0, 0, 0.28); border-color: rgba(216, 181, 107, 0.35); }
+
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(120px, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .stat, .card {
+      background: var(--panel);
+      border: 1px solid rgba(216, 181, 107, 0.28);
+      border-radius: 18px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), inset 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .stat {
+      padding: 14px;
+      min-height: 92px;
+    }
+
+    .label {
+      display: block;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-family: "Cinzel", Georgia, serif;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+
+    .value { font-size: 1.35rem; font-weight: 900; }
+    .red-text { color: #ff7676; }
+    .green-text { color: #74e39c; }
+    .gold-text { color: var(--gold); }
+    .blue-text { color: var(--blue); }
+    .muted { color: var(--muted); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.25fr 0.85fr;
+      gap: 20px;
+      margin-top: 22px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 34px 0 14px;
+      border-bottom: 1px solid rgba(216, 181, 107, 0.38);
+      padding-bottom: 10px;
+    }
+
+    .section-title h2 {
+      color: var(--gold);
+      font-size: 1.35rem;
+      text-transform: uppercase;
+    }
+
+    .grid { display: grid; gap: 14px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .card {
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.055), transparent 38%);
+      pointer-events: none;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      color: #ffe6a3;
+      margin-bottom: 6px;
+    }
+
+    .card p { margin: 6px 0; color: #d3cabd; line-height: 1.38; }
+    .card .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      margin-top: 7px;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--gold-2), var(--gold));
+      transition: width 0.35s ease;
+    }
+
+    .member-meta, .small {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .log {
+      display: grid;
+      gap: 8px;
+      max-height: 390px;
+      overflow: auto;
+      padding-right: 6px;
+    }
+
+    .log-entry {
+      background: rgba(0, 0, 0, 0.26);
+      border-left: 3px solid var(--gold);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #e9dfcf;
+      font-size: 0.92rem;
+    }
+
+    .map {
+      position: relative;
+      min-height: 390px;
+      border-radius: 20px;
+      border: 1px solid rgba(216, 181, 107, 0.28);
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.56), rgba(0, 0, 0, 0.72)),
+        url("https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=1200&auto=format&fit=crop");
+      background-size: cover;
+      background-position: center;
+      box-shadow: var(--shadow);
+    }
+
+    .district {
+      position: absolute;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(216, 181, 107, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: rgba(255, 232, 168, 0.72);
+      font-family: "Cinzel", Georgia, serif;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+
+    .pin {
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.25), 0 0 18px rgba(0, 0, 0, 0.75);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 900;
+      transform: translate(-50%, -50%);
+      transition: transform 0.16s ease;
+    }
+
+    .pin:hover { transform: translate(-50%, -50%) scale(1.18); }
+    .pin.player { background: #b9893f; }
+    .pin.rival { background: #b43b3b; }
+    .pin.free { background: #666; }
+
+    dialog {
+      border: 1px solid rgba(216, 181, 107, 0.48);
+      border-radius: 22px;
+      background: #211e1b;
+      color: var(--text);
+      padding: 0;
+      width: min(760px, calc(100% - 28px));
+      box-shadow: var(--shadow);
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-body { padding: 24px; }
+    .modal-body h2 { color: var(--gold); margin-bottom: 10px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+
+    .toast {
+      position: fixed;
+      z-index: 30;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.82);
+      border: 1px solid rgba(216, 181, 107, 0.48);
+      color: #ffe6a3;
+      padding: 12px 18px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-6px);
+    }
+
+    .danger-panel {
+      border-color: rgba(202, 63, 63, 0.55);
+      background: linear-gradient(135deg, rgba(83, 20, 20, 0.82), rgba(34, 29, 27, 0.92));
+    }
+
+    .footer-note {
+      margin-top: 28px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.82rem;
+    }
+
+    @media (max-width: 1150px) {
+      .hud { grid-template-columns: repeat(4, minmax(120px, 1fr)); }
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 20px, 1500px); padding-top: 10px; }
+      .hero { padding: 18px; border-radius: 18px; }
+      .hud, .grid.two, .grid.three { grid-template-columns: 1fr; }
+      .toolbar { justify-content: flex-start; }
+      .btn { width: 100%; }
+      .card .actions .btn { width: auto; flex: 1 1 130px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>Cosa Nostra</h1>
+          <p class="subtitle">A generational saga</p>
+        </div>
+        <div class="toolbar">
+          <button class="btn gold" id="next-year">Advance Year</button>
+          <button class="btn red" id="street-crime">Street Job</button>
+          <button class="btn blue" id="launder">Launder</button>
+          <button class="btn ghost" id="save-game">Save</button>
+          <button class="btn ghost" id="load-game">Load</button>
+          <button class="btn ghost" id="new-game">New Game</button>
+        </div>
+      </div>
+
+      <div class="hud" id="hud"></div>
+    </section>
+
+    <main class="layout">
+      <div>
+        <div class="section-title">
+          <h2>City Map</h2>
+          <span class="small">Click rackets to acquire, raid, upgrade, or guard them.</span>
+        </div>
+        <div class="map" id="city-map"></div>
+
+        <div class="section-title">
+          <h2>Rackets</h2>
+          <span class="small" id="racket-summary"></span>
+        </div>
+        <div class="grid three" id="racket-grid"></div>
+
+        <div class="section-title">
+          <h2>Family Roster</h2>
+          <button class="btn gold" id="recruit">Recruit Associate</button>
+        </div>
+        <div class="grid two" id="family-grid"></div>
+      </div>
+
+      <aside>
+        <div class="section-title">
+          <h2>Front Businesses</h2>
+        </div>
+        <div class="grid" id="business-grid"></div>
+
+        <div class="section-title">
+          <h2>Influence</h2>
+        </div>
+        <div class="grid" id="influence-grid"></div>
+
+        <div class="section-title">
+          <h2>Dispatches</h2>
+        </div>
+        <div class="card">
+          <div class="log" id="log"></div>
+        </div>
+      </aside>
+    </main>
+
+    <p class="footer-note">Win by reaching $1,000,000 clean cash, controlling every city racket, or surviving a federal case by fleeing to Sicily.</p>
+  </div>
+
+  <dialog id="modal">
+    <div class="modal-body" id="modal-body"></div>
+  </dialog>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    "use strict";
+
+    const CONFIG = {
+      startYear: 1946,
+      recruitCost: 2500,
+      bribeCost: 15000,
+      firstNames: ["Vito", "Sonny", "Michael", "Fredo", "Tom", "Luca", "Peter", "Sal", "Paulie", "Rocco", "Gino", "Marco", "Angelo", "Nico", "Carmine", "Dante", "Enzo", "Tony", "Carlo", "Rosa", "Teresa", "Gia"],
+      lastNames: ["Corleone", "Tattaglia", "Barzini", "Stracci", "Cuneo", "Brasi", "Clemenza", "Tessio", "Gatto", "Lampone", "Cicci", "Neri", "Hagen", "Moretti"],
+      traits: {
+        Loyal: "Loyalty decays slowly and crews hold the line under pressure.",
+        Ambitious: "Improves faster, but resents idle years.",
+        Brute: "High brawn, low brains.",
+        Fixer: "Excellent at lowering heat and laundering cash.",
+        Gambler: "Can earn or lose extra money each year.",
+        Deceitful: "Talented, but loyalty starts low."
+      },
+      rackets: [
+        { id: "speakeasy", name: "Speakeasy", district: "Little Italy", cost: 10000, income: 3500, heat: 2, defense: 180, req: "brains", reqValue: 38, x: 18, y: 22 },
+        { id: "loans", name: "Loan Sharking", district: "Little Italy", cost: 15000, income: 5200, heat: 3, defense: 260, req: "brains", reqValue: 48, x: 35, y: 31 },
+        { id: "protection", name: "Protection Racket", district: "Docks", cost: 42000, income: 13500, heat: 7, defense: 850, req: "brawn", reqValue: 55, x: 20, y: 74 },
+        { id: "smuggling", name: "Smuggling Ring", district: "Docks", cost: 72000, income: 21000, heat: 9, defense: 1050, req: "brawn", reqValue: 66, x: 41, y: 82 },
+        { id: "gambling", name: "Gambling Den", district: "Midtown", cost: 24000, income: 7800, heat: 4, defense: 440, req: "brains", reqValue: 52, x: 64, y: 34 },
+        { id: "casino", name: "Casino Front", district: "Midtown", cost: 96000, income: 26000, heat: 8, defense: 1350, req: "brains", reqValue: 72, x: 82, y: 59 },
+        { id: "narcotics", name: "Narcotics Trade", district: "Midtown", cost: 145000, income: 48000, heat: 15, defense: 780, req: "guts", reqValue: 64, x: 56, y: 51, unlockYear: 1960 }
+      ],
+      businesses: [
+        { id: "bakery", name: "La Bella Bakery", cost: 15000, income: 1000, cap: 6000 },
+        { id: "olive", name: "Genco Olive Oil", cost: 26000, income: 2200, cap: 12000 },
+        { id: "construction", name: "Corleone Construction", cost: 76000, income: 5500, cap: 28000 },
+        { id: "import", name: "Oceanic Import/Export", cost: 195000, income: 16000, cap: 65000 }
+      ],
+      influence: [
+        { id: "police", name: "Police Chief", cost: 350000, bonus: "Heat from rackets reduced by 60%." },
+        { id: "mayor", name: "Mayor's Office", cost: 500000, bonus: "All income increases by 20%." },
+        { id: "union", name: "Union Boss", cost: 400000, bonus: "Docks rackets gain +50% income." }
+      ],
+      rivals: ["Tattaglia Family", "Barzini Family", "Stracci Family", "Cuneo Family"]
+    };
+
+    const $ = (selector) => document.querySelector(selector);
+    const money = (amount) => `$${Math.round(amount).toLocaleString()}`;
+    const pct = (amount) => `${Math.round(amount)}%`;
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const pick = (items) => items[rand(0, items.length - 1)];
+
+    const dom = {
+      hud: $("#hud"),
+      map: $("#city-map"),
+      rackets: $("#racket-grid"),
+      family: $("#family-grid"),
+      businesses: $("#business-grid"),
+      influence: $("#influence-grid"),
+      log: $("#log"),
+      modal: $("#modal"),
+      modalBody: $("#modal-body"),
+      toast: $("#toast"),
+      summary: $("#racket-summary")
+    };
+
+    let game = createNewGame();
+    let toastTimer = null;
+
+    function createNewGame() {
+      const boss = createMember(true);
+      const rackets = CONFIG.rackets.map((racket) => ({
+        ...racket,
+        owner: racket.unlockYear ? "locked" : (Math.random() > 0.42 ? pick(CONFIG.rivals) : null),
+        guards: [],
+        upgrades: [],
+        shutDownUntil: 0
+      }));
+
+      return {
+        year: CONFIG.startYear,
+        era: "The Golden Age",
+        dirty: 10000,
+        clean: 20000,
+        favors: 0,
+        heat: 0,
+        caseFile: 0,
+        generation: 1,
+        members: [boss],
+        rackets,
+        businesses: [],
+        influence: { police: 0, mayor: 0, union: 0 },
+        log: [
+          { year: CONFIG.startYear, text: `${boss.name} has opened the books. The city is waiting.` }
+        ],
+        over: false
+      };
+    }
+
+    function createMember(isBoss = false) {
+      const trait = isBoss ? "Loyal" : pick(Object.keys(CONFIG.traits));
+      const lastName = isBoss ? "Corleone" : pick(CONFIG.lastNames);
+      const member = {
+        id: crypto.randomUUID(),
+        name: `${isBoss ? "Don " : ""}${pick(CONFIG.firstNames)} ${lastName}`,
+        age: isBoss ? 45 : rand(19, 33),
+        role: isBoss ? "Don" : "Idle",
+        years: 0,
+        isBoss,
+        made: isBoss,
+        loyalty: isBoss ? 100 : rand(46, 92),
+        brawn: rand(28, 70),
+        brains: rand(28, 70),
+        guts: rand(28, 70),
+        trait,
+        assignedRacket: null
+      };
+
+      if (trait === "Brute") {
+        member.brawn = clamp(member.brawn + 28, 1, 100);
+        member.brains = clamp(member.brains - 18, 1, 100);
+      }
+      if (trait === "Fixer") member.brains = clamp(member.brains + 18, 1, 100);
+      if (trait === "Deceitful") member.loyalty = clamp(member.loyalty - 24, 1, 100);
+      return member;
+    }
+
+    function log(text, important = false) {
+      game.log.unshift({ year: game.year, text, important });
+      game.log = game.log.slice(0, 42);
+      showToast(text);
+    }
+
+    function showToast(text) {
+      dom.toast.textContent = text;
+      dom.toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => dom.toast.classList.remove("show"), 2600);
+    }
+
+    function calculateIncome() {
+      const mayorBonus = game.influence.mayor >= getInfluence("mayor").cost ? 1.2 : 1;
+      const unionBonus = game.influence.union >= getInfluence("union").cost ? 1.5 : 1;
+      let dirty = 0;
+      let clean = 0;
+      let heat = 0;
+      let launderCap = 0;
+
+      for (const racket of game.rackets) {
+        if (racket.owner !== "player" || racket.shutDownUntil >= game.year) continue;
+        let income = racket.income;
+        if (racket.district === "Docks") income *= unionBonus;
+        if (racket.upgrades.includes("vip")) income *= 1.75;
+        if (racket.id === "casino" && racket.upgrades.includes("vault")) clean += income * mayorBonus;
+        else dirty += income * mayorBonus;
+        heat += racket.heat;
+      }
+
+      for (const id of game.businesses) {
+        const business = CONFIG.businesses.find((item) => item.id === id);
+        clean += business.income * mayorBonus;
+        launderCap += business.cap;
+      }
+
+      if (game.influence.police >= getInfluence("police").cost) heat *= 0.4;
+      return { dirty, clean, heat, launderCap };
+    }
+
+    function getInfluence(id) {
+      return CONFIG.influence.find((item) => item.id === id);
+    }
+
+    function getRacket(id) {
+      return game.rackets.find((racket) => racket.id === id);
+    }
+
+    function getMember(id) {
+      return game.members.find((member) => member.id === id);
+    }
+
+    function getDefense(racket) {
+      let defense = racket.defense;
+      if (racket.upgrades.includes("vault")) defense += 300;
+      for (const id of racket.guards) {
+        const guard = getMember(id);
+        if (guard) defense += guard.brawn * 12 + guard.guts * 5;
+      }
+      return Math.round(defense);
+    }
+
+    function activeMembers() {
+      return game.members.filter((member) => member.role !== "Deceased");
+    }
+
+    function availableCrew() {
+      return activeMembers().filter((member) => !member.isBoss && member.age >= 18);
+    }
+
+    function render() {
+      const inc = calculateIncome();
+      const ownedRackets = game.rackets.filter((racket) => racket.owner === "player").length;
+      const availableRackets = game.rackets.filter((racket) => racket.owner !== "locked").length;
+
+      dom.hud.innerHTML = [
+        stat("Year", game.year, "gold-text", game.era),
+        stat("Generation", game.generation, "", "Family line"),
+        stat("Dirty Cash", money(game.dirty), "red-text", `+${money(inc.dirty)} / yr`),
+        stat("Clean Cash", money(game.clean), "green-text", `+${money(inc.clean)} / yr`),
+        stat("Heat", Math.round(game.heat), game.heat > 70 ? "red-text" : "", `+${Math.round(inc.heat)} / yr`),
+        stat("Federal Case", pct(game.caseFile), game.caseFile > 70 ? "red-text" : "", "RICO risk"),
+        stat("Family", activeMembers().length, "", "Alive members"),
+        stat("Favors", game.favors, "blue-text", "Political leverage")
+      ].join("");
+
+      dom.summary.textContent = `${ownedRackets}/${availableRackets} controlled`;
+      renderMap();
+      renderRackets();
+      renderFamily();
+      renderBusinesses();
+      renderInfluence();
+      renderLog();
+      updateButtons();
+    }
+
+    function stat(label, value, klass, subtext) {
+      return `
+        <div class="stat">
+          <span class="label">${label}</span>
+          <div class="value ${klass || ""}">${value}</div>
+          <div class="small">${subtext || ""}</div>
+        </div>
+      `;
+    }
+
+    function renderMap() {
+      dom.map.innerHTML = `
+        <div class="district" style="left:0;top:0;width:50%;height:50%;">Little Italy</div>
+        <div class="district" style="left:0;top:50%;width:50%;height:50%;">The Docks</div>
+        <div class="district" style="left:50%;top:0;width:50%;height:100%;">Midtown</div>
+      `;
+
+      for (const racket of game.rackets) {
+        if (racket.owner === "locked") continue;
+        const ownerClass = racket.owner === "player" ? "player" : racket.owner ? "rival" : "free";
+        const pin = document.createElement("button");
+        pin.className = `pin ${ownerClass}`;
+        pin.style.left = `${racket.x}%`;
+        pin.style.top = `${racket.y}%`;
+        pin.title = `${racket.name} - ${racket.owner || "Unclaimed"}`;
+        pin.textContent = racket.name.slice(0, 1);
+        pin.addEventListener("click", () => openRacketModal(racket.id));
+        dom.map.appendChild(pin);
+      }
+    }
+
+    function renderRackets() {
+      dom.rackets.innerHTML = game.rackets
+        .filter((racket) => racket.owner !== "locked")
+        .map((racket) => {
+          const owner = racket.owner === "player" ? "Controlled" : racket.owner || "Unclaimed";
+          const ownerClass = racket.owner === "player" ? "green-text" : racket.owner ? "red-text" : "gold-text";
+          return `
+            <article class="card">
+              <h3>${racket.name}</h3>
+              <p class="member-meta">${racket.district} | ${racket.req.toUpperCase()} ${racket.reqValue}+ recommended</p>
+              <p><strong class="${ownerClass}">${owner}</strong></p>
+              <p>Income: <span class="red-text">${money(racket.income)}</span> / yr | Defense: ${getDefense(racket)}</p>
+              <p class="small">Heat: +${racket.heat}/yr | Upgrades: ${racket.upgrades.length}/3 | Guards: ${racket.guards.length}</p>
+              <div class="actions">
+                <button class="btn gold" data-racket="${racket.id}">Manage</button>
+              </div>
+            </article>
+          `;
+        }).join("");
+
+      dom.rackets.querySelectorAll("[data-racket]").forEach((button) => {
+        button.addEventListener("click", () => openRacketModal(button.dataset.racket));
+      });
+    }
+
+    function renderFamily() {
+      dom.family.innerHTML = activeMembers().map((member) => {
+        const rankNote = member.made ? "Made" : `${Math.max(0, 10 - member.years)} yrs to made`;
+        return `
+          <article class="card">
+            <h3>${member.name}</h3>
+            <p class="member-meta">${member.role} | Age ${member.age} | ${member.trait} | ${rankNote}</p>
+            <p class="small">${CONFIG.traits[member.trait] || "Runs the family."}</p>
+            ${bar("Brawn", member.brawn)}
+            ${bar("Brains", member.brains)}
+            ${bar("Guts", member.guts)}
+            ${bar("Loyalty", member.loyalty, member.loyalty < 35 ? "linear-gradient(90deg, #842222, #ca3f3f)" : undefined)}
+            <div class="actions">
+              ${!member.isBoss && !member.made && member.years >= 10 ? `<button class="btn gold" data-make="${member.id}">Make Man</button>` : ""}
+              ${member.made && !member.isBoss && member.role !== "Capo" ? `<button class="btn ghost" data-capo="${member.id}">Promote Capo</button>` : ""}
+              ${!member.isBoss ? `<button class="btn red" data-dismiss="${member.id}">Cut Loose</button>` : ""}
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      dom.family.querySelectorAll("[data-make]").forEach((button) => {
+        button.addEventListener("click", () => makeMember(button.dataset.make));
+      });
+      dom.family.querySelectorAll("[data-capo]").forEach((button) => {
+        button.addEventListener("click", () => promoteCapo(button.dataset.capo));
+      });
+      dom.family.querySelectorAll("[data-dismiss]").forEach((button) => {
+        button.addEventListener("click", () => dismissMember(button.dataset.dismiss));
+      });
+    }
+
+    function bar(label, value, color) {
+      return `
+        <div class="small" style="margin-top:8px;">${label}: <strong>${Math.round(value)}</strong></div>
+        <div class="bar"><span style="width:${clamp(value, 0, 100)}%;${color ? `background:${color};` : ""}"></span></div>
+      `;
+    }
+
+    function renderBusinesses() {
+      dom.businesses.innerHTML = CONFIG.businesses.map((business) => {
+        const owned = game.businesses.includes(business.id);
+        return `
+          <article class="card">
+            <h3>${business.name}</h3>
+            <p>Clean income: <span class="green-text">${money(business.income)}</span> / yr</p>
+            <p class="small">Laundering capacity: ${money(business.cap)} / yr</p>
+            <div class="actions">
+              <button class="btn ${owned ? "ghost" : "green"}" data-business="${business.id}" ${owned || game.clean < business.cost ? "disabled" : ""}>
+                ${owned ? "Owned" : `Buy ${money(business.cost)}`}
+              </button>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      dom.businesses.querySelectorAll("[data-business]").forEach((button) => {
+        button.addEventListener("click", () => buyBusiness(button.dataset.business));
+      });
+    }
+
+    function renderInfluence() {
+      dom.influence.innerHTML = CONFIG.influence.map((target) => {
+        const value = game.influence[target.id];
+        const complete = value >= target.cost;
+        return `
+          <article class="card">
+            <h3>${target.name}</h3>
+            <p class="small">${target.bonus}</p>
+            ${bar("Progress", (value / target.cost) * 100)}
+            <div class="actions">
+              <button class="btn blue" data-influence="${target.id}" ${complete || game.clean < 30000 ? "disabled" : ""}>
+                ${complete ? "Secured" : "Invest $30k"}
+              </button>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      dom.influence.querySelectorAll("[data-influence]").forEach((button) => {
+        button.addEventListener("click", () => buyInfluence(button.dataset.influence));
+      });
+    }
+
+    function renderLog() {
+      dom.log.innerHTML = game.log.map((entry) => `
+        <div class="log-entry ${entry.important ? "danger-panel" : ""}">
+          <strong>${entry.year}</strong> - ${entry.text}
+        </div>
+      `).join("");
+    }
+
+    function updateButtons() {
+      $("#recruit").disabled = game.dirty < CONFIG.recruitCost || game.over;
+      $("#next-year").disabled = game.over;
+      $("#street-crime").disabled = game.over;
+      $("#launder").disabled = game.dirty < 1000 || game.over;
+    }
+
+    function openRacketModal(id) {
+      const racket = getRacket(id);
+      const body = [];
+      body.push(`<h2>${racket.name}</h2>`);
+      body.push(`<p class="muted">${racket.district} | Owner: <strong>${racket.owner === "player" ? "You" : racket.owner || "Unclaimed"}</strong></p>`);
+      body.push(`<p>Income ${money(racket.income)} / yr, Heat +${racket.heat} / yr, Defense ${getDefense(racket)}.</p>`);
+
+      if (racket.owner === "player") {
+        body.push(`
+          <div class="grid two" style="margin-top:16px;">
+            ${upgradeButton(racket, "vault", "Hidden Vault", 20000, "+300 defense against raids.")}
+            ${upgradeButton(racket, "vip", "VIP Room", 35000, "+75% racket income.")}
+            ${upgradeButton(racket, "tunnel", "Escape Tunnel", 25000, "Guards survive lost defenses.")}
+          </div>
+          <h3 style="margin-top:18px;">Assign Guards</h3>
+          <div class="grid">${availableCrew().map((member) => `
+            <label class="card" style="display:flex;gap:10px;align-items:center;">
+              <input type="checkbox" data-guard="${member.id}" ${racket.guards.includes(member.id) ? "checked" : ""} />
+              <span><strong>${member.name}</strong><br><span class="small">Brawn ${member.brawn}, Guts ${member.guts}, ${member.role}</span></span>
+            </label>
+          `).join("") || `<p class="muted">No available crew to guard this racket.</p>`}</div>
+        `);
+      } else if (!racket.owner) {
+        body.push(`<button class="btn gold" id="buy-racket" ${game.dirty < racket.cost ? "disabled" : ""}>Buy for ${money(racket.cost)} Dirty</button>`);
+      } else {
+        body.push(`<p class="small">Send crew to take this from ${racket.owner}. Better brawn improves the odds.</p>`);
+        body.push(`<button class="btn red" id="raid-racket">Plan Raid</button>`);
+      }
+
+      showModal(`${body.join("")}<div class="modal-actions"><button class="btn ghost" id="close-modal">Close</button></div>`);
+
+      $("#close-modal").addEventListener("click", closeModal);
+      const buy = $("#buy-racket");
+      if (buy) buy.addEventListener("click", () => buyRacket(id));
+      const raid = $("#raid-racket");
+      if (raid) raid.addEventListener("click", () => openRaidModal(id));
+      dom.modalBody.querySelectorAll("[data-upgrade]").forEach((button) => {
+        button.addEventListener("click", () => buyUpgrade(id, button.dataset.upgrade, Number(button.dataset.cost)));
+      });
+      dom.modalBody.querySelectorAll("[data-guard]").forEach((check) => {
+        check.addEventListener("change", () => toggleGuard(id, check.dataset.guard, check.checked));
+      });
+    }
+
+    function upgradeButton(racket, id, name, cost, desc) {
+      const owned = racket.upgrades.includes(id);
+      return `
+        <div class="card">
+          <h3>${name}</h3>
+          <p class="small">${desc}</p>
+          <button class="btn gold" data-upgrade="${id}" data-cost="${cost}" ${owned || racket.upgrades.length >= 3 || game.dirty < cost ? "disabled" : ""}>
+            ${owned ? "Installed" : `Install ${money(cost)}`}
+          </button>
+        </div>
+      `;
+    }
+
+    function showModal(html) {
+      dom.modalBody.innerHTML = html;
+      dom.modal.showModal();
+    }
+
+    function closeModal() {
+      dom.modal.close();
+    }
+
+    function buyRacket(id) {
+      const racket = getRacket(id);
+      if (!racket || racket.owner || game.dirty < racket.cost) return;
+      const qualified = activeMembers().some((member) => member[ racket.req ] >= racket.reqValue);
+      game.dirty -= racket.cost;
+      racket.owner = "player";
+      if (!qualified) {
+        game.heat += 8;
+        log(`You bought the ${racket.name}, but weak local management drew attention.`, true);
+      } else {
+        log(`The ${racket.name} now pays tribute to you.`);
+      }
+      closeModal();
+      render();
+    }
+
+    function buyUpgrade(id, upgradeId, cost) {
+      const racket = getRacket(id);
+      if (!racket || racket.owner !== "player" || racket.upgrades.includes(upgradeId) || racket.upgrades.length >= 3 || game.dirty < cost) return;
+      game.dirty -= cost;
+      racket.upgrades.push(upgradeId);
+      log(`Installed a new ${upgradeId.replace("-", " ")} at the ${racket.name}.`);
+      openRacketModal(id);
+      render();
+    }
+
+    function toggleGuard(racketId, memberId, checked) {
+      const racket = getRacket(racketId);
+      const member = getMember(memberId);
+      if (!racket || !member) return;
+
+      for (const other of game.rackets) {
+        other.guards = other.guards.filter((id) => id !== memberId);
+      }
+
+      if (checked) {
+        racket.guards.push(memberId);
+        member.assignedRacket = racketId;
+        member.role = member.made ? "Soldier" : "Working";
+      } else {
+        member.assignedRacket = null;
+        member.role = member.made ? "Soldier" : "Idle";
+      }
+      render();
+    }
+
+    function openRaidModal(id) {
+      const racket = getRacket(id);
+      const crew = availableCrew();
+      showModal(`
+        <h2>Raid ${racket.name}</h2>
+        <p class="muted">Choose the crew. If you win, the racket becomes yours. If you lose, somebody may not come home.</p>
+        <div class="grid">
+          ${crew.map((member) => `
+            <label class="card" style="display:flex;gap:10px;align-items:center;">
+              <input type="checkbox" data-raid="${member.id}" />
+              <span><strong>${member.name}</strong><br><span class="small">Brawn ${member.brawn}, Guts ${member.guts}, Loyalty ${member.loyalty}</span></span>
+            </label>
+          `).join("") || `<p class="muted">Recruit more crew before starting a war.</p>`}
+        </div>
+        <div class="modal-actions">
+          <button class="btn ghost" id="close-modal">Cancel</button>
+          <button class="btn red" id="launch-raid" ${crew.length === 0 ? "disabled" : ""}>Launch Raid</button>
+        </div>
+      `);
+      $("#close-modal").addEventListener("click", closeModal);
+      $("#launch-raid").addEventListener("click", () => launchRaid(id));
+    }
+
+    function launchRaid(id) {
+      const racket = getRacket(id);
+      const selected = Array.from(dom.modalBody.querySelectorAll("[data-raid]:checked")).map((input) => input.dataset.raid);
+      if (selected.length === 0) return;
+
+      const attack = selected.reduce((total, memberId) => {
+        const member = getMember(memberId);
+        return total + member.brawn * 11 + member.guts * 6;
+      }, rand(0, 220));
+      const defense = getDefense(racket) + rand(0, 280);
+      game.heat += 18;
+
+      if (attack > defense) {
+        racket.owner = "player";
+        racket.guards = [];
+        racket.upgrades = [];
+        selected.forEach((memberId) => {
+          const member = getMember(memberId);
+          if (member) member.loyalty = clamp(member.loyalty + 4, 0, 100);
+        });
+        log(`Victory at the ${racket.name}. The neighborhood knows who owns the night.`, true);
+      } else {
+        const victim = getMember(pick(selected));
+        if (victim && Math.random() < 0.55) {
+          victim.role = "Deceased";
+          log(`The raid failed. ${victim.name} was killed in the gunfire.`, true);
+        } else {
+          log(`The raid on the ${racket.name} failed and raised heat.`, true);
+        }
+      }
+      closeModal();
+      render();
+    }
+
+    function recruitMember() {
+      if (game.dirty < CONFIG.recruitCost) return;
+      game.dirty -= CONFIG.recruitCost;
+      const member = createMember(false);
+      game.members.push(member);
+      log(`${member.name} joined as an associate.`);
+      render();
+    }
+
+    function makeMember(id) {
+      const member = getMember(id);
+      if (!member || member.made || member.years < 10) return;
+      member.made = true;
+      member.role = "Soldier";
+      member.brawn = clamp(member.brawn + 8, 0, 100);
+      member.brains = clamp(member.brains + 8, 0, 100);
+      member.guts = clamp(member.guts + 8, 0, 100);
+      member.loyalty = clamp(member.loyalty + 18, 0, 100);
+      log(`${member.name} has been made.`);
+      render();
+    }
+
+    function promoteCapo(id) {
+      const member = getMember(id);
+      if (!member || !member.made) return;
+      member.role = "Capo";
+      member.loyalty = clamp(member.loyalty + 8, 0, 100);
+      log(`${member.name} is now a Capo.`);
+      render();
+    }
+
+    function dismissMember(id) {
+      const member = getMember(id);
+      if (!member || member.isBoss) return;
+      for (const racket of game.rackets) racket.guards = racket.guards.filter((guardId) => guardId !== id);
+      member.role = "Deceased";
+      log(`${member.name} was cut loose from the family.`);
+      render();
+    }
+
+    function buyBusiness(id) {
+      const business = CONFIG.businesses.find((item) => item.id === id);
+      if (!business || game.businesses.includes(id) || game.clean < business.cost) return;
+      game.clean -= business.cost;
+      game.businesses.push(id);
+      log(`${business.name} is now a legitimate front.`);
+      render();
+    }
+
+    function buyInfluence(id) {
+      const target = getInfluence(id);
+      if (!target || game.influence[id] >= target.cost || game.clean < 30000) return;
+      game.clean -= 30000;
+      game.influence[id] = clamp(game.influence[id] + 30000, 0, target.cost);
+      log(`Clean cash moved quietly through ${target.name}.`);
+      render();
+    }
+
+    function streetCrime() {
+      showModal(`
+        <h2>Street Job</h2>
+        <p class="muted">Fast money creates fast heat. Use these to get unstuck, not as a whole business plan.</p>
+        <div class="grid">
+          <button class="btn red" data-job="shakedown">Shake Down Locals: +$5k Dirty, +10 Heat</button>
+          <button class="btn red" data-job="hijack">Hijack Truck: 80% chance +$25k Dirty, +25 Heat</button>
+          <button class="btn gold" data-job="game" ${game.dirty < 5000 ? "disabled" : ""}>High-Stakes Game: Risk $5k for $30k</button>
+        </div>
+        <div class="modal-actions"><button class="btn ghost" id="close-modal">Close</button></div>
+      `);
+      $("#close-modal").addEventListener("click", closeModal);
+      dom.modalBody.querySelectorAll("[data-job]").forEach((button) => button.addEventListener("click", () => executeStreetJob(button.dataset.job)));
+    }
+
+    function executeStreetJob(job) {
+      if (job === "shakedown") {
+        game.dirty += 5000;
+        game.heat += 10;
+        log("The locals paid protection. Dirty cash is up, heat is up.");
+      } else if (job === "hijack") {
+        game.heat += 25;
+        if (Math.random() < 0.8) {
+          game.dirty += 25000;
+          log("The truck was hijacked cleanly. The envelopes are full.");
+        } else {
+          const victims = availableCrew();
+          if (victims.length) {
+            const victim = pick(victims);
+            victim.role = "Deceased";
+            log(`The hijack was a setup. ${victim.name} did not survive.`, true);
+          } else {
+            log("The hijack failed and the cops are circling.", true);
+          }
+        }
+      } else if (job === "game" && game.dirty >= 5000) {
+        game.dirty -= 5000;
+        if (Math.random() < 0.42) {
+          game.dirty += 30000;
+          log("The cards broke your way. A tidy profit.");
+        } else {
+          log("The cards were cold. You lost the buy-in.");
+        }
+      }
+      closeModal();
+      render();
+    }
+
+    function openLaunder() {
+      const cap = calculateIncome().launderCap;
+      showModal(`
+        <h2>Launder Cash</h2>
+        <p class="muted">Your fronts automatically launder up to ${money(cap)} each year. Emergency street laundering takes a 50% cut.</p>
+        <p>Dirty Cash: <strong class="red-text">${money(game.dirty)}</strong></p>
+        <div class="grid">
+          <button class="btn green" data-launder="10000" ${game.dirty < 10000 ? "disabled" : ""}>Wash $10k into $5k clean</button>
+          <button class="btn green" data-launder="50000" ${game.dirty < 50000 ? "disabled" : ""}>Wash $50k into $25k clean</button>
+        </div>
+        <div class="modal-actions"><button class="btn ghost" id="close-modal">Close</button></div>
+      `);
+      $("#close-modal").addEventListener("click", closeModal);
+      dom.modalBody.querySelectorAll("[data-launder]").forEach((button) => {
+        button.addEventListener("click", () => manualLaunder(Number(button.dataset.launder)));
+      });
+    }
+
+    function manualLaunder(amount) {
+      if (game.dirty < amount) return;
+      game.dirty -= amount;
+      game.clean += amount / 2;
+      log(`Street accountants washed ${money(amount)} for a steep fee.`);
+      closeModal();
+      render();
+    }
+
+    function advanceYear() {
+      if (game.over) return;
+      const inc = calculateIncome();
+      game.year += 1;
+
+      if (game.year === 1960) {
+        game.era = "The Narcotics Boom";
+        const narcotics = getRacket("narcotics");
+        if (narcotics && narcotics.owner === "locked") narcotics.owner = pick(CONFIG.rivals);
+        log("A new narcotics market opens in Midtown. The money is huge and the attention is worse.", true);
+      }
+      if (game.year === 1970) {
+        game.era = "The RICO Era";
+        log("RICO changes the rules. Federal cases now build every year.", true);
+      }
+
+      game.dirty += inc.dirty;
+      game.clean += inc.clean;
+      game.heat += inc.heat;
+
+      const upkeep = activeMembers().reduce((total, member) => {
+        if (member.isBoss) return total;
+        if (member.role === "Capo") return total + 1200;
+        if (member.made) return total + 650;
+        return total + 220;
+      }, 0);
+      payUpkeep(upkeep);
+
+      const laundered = Math.min(game.dirty, inc.launderCap);
+      if (laundered > 0) {
+        game.dirty -= laundered;
+        game.clean += laundered;
+        log(`Fronts laundered ${money(laundered)} into clean cash.`);
+      }
+
+      ageMembers();
+      rivalTurn();
+      federalTurn();
+      randomEvent();
+      checkEndings();
+      render();
+    }
+
+    function payUpkeep(amount) {
+      if (amount <= 0) return;
+      if (game.dirty >= amount) {
+        game.dirty -= amount;
+        return;
+      }
+      const shortfall = amount - game.dirty;
+      game.dirty = 0;
+      if (game.clean >= shortfall) {
+        game.clean -= shortfall;
+      } else {
+        game.clean = 0;
+        activeMembers().forEach((member) => {
+          if (!member.isBoss) member.loyalty = clamp(member.loyalty - 10, 0, 100);
+        });
+        log("Payroll came up short. Loyalty suffered.", true);
+      }
+    }
+
+    function ageMembers() {
+      for (const member of activeMembers()) {
+        member.age += 1;
+        member.years += 1;
+        if (member.trait === "Ambitious" && member.role === "Idle") member.loyalty = clamp(member.loyalty - 8, 0, 100);
+        if (member.trait === "Loyal") member.loyalty = clamp(member.loyalty + 1, 0, 100);
+        if (member.trait === "Gambler") {
+          const swing = rand(-3500, 5000);
+          if (swing >= 0) game.dirty += swing;
+          else game.dirty = Math.max(0, game.dirty + swing);
+        }
+        if (member.role !== "Idle") {
+          member.brawn = clamp(member.brawn + rand(0, 2), 0, 100);
+          member.brains = clamp(member.brains + rand(0, 2), 0, 100);
+          member.guts = clamp(member.guts + rand(0, 2), 0, 100);
+        }
+
+        if (member.age > 62 && Math.random() < Math.pow(member.age / 100, 4)) {
+          member.role = "Deceased";
+          log(`${member.name} passed away.`, member.isBoss);
+          if (member.isBoss) handleSuccession(member.name);
+        }
+      }
+    }
+
+    function handleSuccession(oldName) {
+      const candidates = activeMembers().filter((member) => !member.isBoss);
+      if (!candidates.length) {
+        endGame("The family line has ended. No one remains to take the chair.", false);
+        return;
+      }
+      candidates.sort((a, b) => (b.made - a.made) || (b.guts + b.loyalty) - (a.guts + a.loyalty));
+      const next = candidates[0];
+      next.isBoss = true;
+      next.made = true;
+      next.role = "Don";
+      next.name = `Don ${next.name.replace(/^Don\s+/, "")}`;
+      game.generation += 1;
+      log(`${oldName} is gone. ${next.name} now leads the family.`, true);
+    }
+
+    function rivalTurn() {
+      for (const racket of game.rackets.filter((item) => item.owner === "player")) {
+        const pressure = game.heat / 100 + (racket.income / 120000);
+        if (Math.random() < pressure * 0.09) {
+          const rival = pick(CONFIG.rivals);
+          const attack = rand(450, 1700) + game.year - CONFIG.startYear;
+          if (attack > getDefense(racket)) {
+            const tunnel = racket.upgrades.includes("tunnel");
+            if (!tunnel) {
+              for (const id of racket.guards) {
+                if (Math.random() < 0.35) {
+                  const guard = getMember(id);
+                  if (guard) guard.role = "Deceased";
+                }
+              }
+            }
+            racket.owner = rival;
+            racket.guards = [];
+            racket.upgrades = [];
+            log(`${rival} raided and stole the ${racket.name}.`, true);
+          } else {
+            log(`Your guards repelled a raid on the ${racket.name}.`);
+          }
+        }
+      }
+
+      const unclaimed = game.rackets.filter((racket) => !racket.owner);
+      if (unclaimed.length && Math.random() < 0.18) {
+        const target = pick(unclaimed);
+        target.owner = pick(CONFIG.rivals);
+        log(`${target.owner} moved into the unclaimed ${target.name}.`);
+      }
+    }
+
+    function federalTurn() {
+      game.heat = clamp(game.heat - 5, 0, 150);
+      if (game.era === "The RICO Era") {
+        game.caseFile = clamp(game.caseFile + game.heat / 16 + game.rackets.filter((racket) => racket.owner === "player").length * 1.2, 0, 100);
+      } else if (game.heat > 70) {
+        game.caseFile = clamp(game.caseFile + 2.5, 0, 100);
+      }
+
+      if (game.caseFile >= 100) {
+        showTrial();
+      }
+    }
+
+    function showTrial() {
+      const cleanEscape = game.clean >= 100000;
+      showModal(`
+        <h2>Federal Indictment</h2>
+        <p>The case file is complete. Prosecutors are moving against the family.</p>
+        <div class="grid">
+          <button class="btn blue" id="bribe-case" ${game.clean < CONFIG.bribeCost * 3 ? "disabled" : ""}>Burn Evidence (${money(CONFIG.bribeCost * 3)} Clean)</button>
+          <button class="btn gold" id="flee" ${!cleanEscape ? "disabled" : ""}>Flee to Sicily (${money(100000)} Clean)</button>
+          <button class="btn red" id="stand-trial">Stand Trial</button>
+        </div>
+      `);
+      $("#bribe-case").addEventListener("click", () => {
+        if (game.clean < CONFIG.bribeCost * 3) return;
+        game.clean -= CONFIG.bribeCost * 3;
+        game.caseFile = 45;
+        game.heat = clamp(game.heat - 30, 0, 150);
+        log("Evidence disappeared. The case is damaged, but not dead.", true);
+        closeModal();
+        render();
+      });
+      $("#flee").addEventListener("click", () => {
+        game.clean -= 100000;
+        endGame("You escaped to Sicily with enough clean money to live like a king. You win.", true);
+        closeModal();
+      });
+      $("#stand-trial").addEventListener("click", () => {
+        if (Math.random() < 0.28 + game.influence.mayor / 1000000) {
+          game.caseFile = 30;
+          game.heat = 20;
+          log("A miracle acquittal. The jury was friendly.", true);
+          closeModal();
+          render();
+        } else {
+          endGame("The trial ended in convictions. The organization collapses under federal pressure.", false);
+          closeModal();
+        }
+      });
+    }
+
+    function randomEvent() {
+      if (Math.random() > 0.28 || game.over) return;
+      const events = [
+        () => {
+          game.favors += 1;
+          log("A judge's nephew needed help. You earned a political favor.");
+        },
+        () => {
+          game.heat += 12;
+          log("An informant talked before disappearing. Heat rises.", true);
+        },
+        () => {
+          const amount = rand(3500, 10000);
+          game.dirty += amount;
+          log(`A forgotten envelope surfaced in the back room. ${money(amount)} dirty cash.`);
+        },
+        () => {
+          activeMembers().forEach((member) => {
+            if (!member.isBoss) member.loyalty = clamp(member.loyalty + 4, 0, 100);
+          });
+          log("A family wedding restored morale across the crew.");
+        }
+      ];
+      pick(events)();
+    }
+
+    function checkEndings() {
+      if (game.over) return;
+      const controlled = game.rackets.filter((racket) => racket.owner === "player").length;
+      const available = game.rackets.filter((racket) => racket.owner !== "locked").length;
+      if (game.clean >= 1000000) {
+        endGame("Your clean fortune crossed $1,000,000. The family is legitimate enough to survive anything. You win.", true);
+      } else if (available > 0 && controlled === available && game.year >= 1960) {
+        endGame("Every racket in the city pays tribute to your family. You are boss of bosses. You win.", true);
+      } else if (!activeMembers().some((member) => member.isBoss)) {
+        endGame("There is no Don left to keep the family together.", false);
+      }
+    }
+
+    function endGame(message, victory) {
+      game.over = true;
+      log(message, true);
+      showModal(`
+        <h2>${victory ? "Victory" : "Game Over"}</h2>
+        <p>${message}</p>
+        <div class="modal-actions">
+          <button class="btn gold" id="restart">Start a New Family</button>
+        </div>
+      `);
+      $("#restart").addEventListener("click", () => {
+        game = createNewGame();
+        closeModal();
+        render();
+      });
+    }
+
+    function saveGame() {
+      localStorage.setItem("cosa-nostra-save", JSON.stringify(game));
+      log("Game saved.");
+      render();
+    }
+
+    function loadGame() {
+      const saved = localStorage.getItem("cosa-nostra-save");
+      if (!saved) {
+        showToast("No saved game found.");
+        return;
+      }
+      try {
+        game = JSON.parse(saved);
+        log("Game loaded.");
+        render();
+      } catch {
+        showToast("Save file could not be loaded.");
+      }
+    }
+
+    function newGame() {
+      showModal(`
+        <h2>Start Over?</h2>
+        <p>This will replace the current run. Save first if you want to keep it.</p>
+        <div class="modal-actions">
+          <button class="btn ghost" id="close-modal">Cancel</button>
+          <button class="btn red" id="confirm-new">Start New Game</button>
+        </div>
+      `);
+      $("#close-modal").addEventListener("click", closeModal);
+      $("#confirm-new").addEventListener("click", () => {
+        game = createNewGame();
+        closeModal();
+        render();
+      });
+    }
+
+    $("#next-year").addEventListener("click", advanceYear);
+    $("#street-crime").addEventListener("click", streetCrime);
+    $("#launder").addEventListener("click", openLaunder);
+    $("#recruit").addEventListener("click", recruitMember);
+    $("#save-game").addEventListener("click", saveGame);
+    $("#load-game").addEventListener("click", loadGame);
+    $("#new-game").addEventListener("click", newGame);
+    dom.modal.addEventListener("click", (event) => {
+      const rect = dom.modal.getBoundingClientRect();
+      const outside = event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
+      if (outside) closeModal();
+    });
+
+    render();
+  </script>
+</body>
+</html>
