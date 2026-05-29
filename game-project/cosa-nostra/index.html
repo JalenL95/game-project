@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosa Nostra: A Generational Saga</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="text-gray-200 custom-scrollbar">
+    <!-- Start Screen -->
+    <div id="start-screen" class="fixed inset-0 z-[200] flex items-center justify-center bg-black bg-opacity-95">
+        <div class="text-center max-w-2xl px-6">
+            <h1 class="text-5xl md:text-7xl font-cinzel font-bold text-amber-200 tracking-widest mb-2">COSA NOSTRA</h1>
+            <p class="text-amber-400 text-xl mb-2 font-cinzel">A Generational Saga</p>
+            <p class="text-gray-400 text-sm mb-10 leading-relaxed">Build your crime family from 1946 through the RICO era. Control rackets, survive rival wars, launder dirty cash, and pass the crown from Don to Don.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button id="btn-new-game" class="btn btn-primary font-cinzel font-bold py-3 px-10 rounded-lg text-lg">New Dynasty</button>
+                <button id="btn-continue" class="btn btn-secondary font-cinzel font-bold py-3 px-10 rounded-lg text-lg" disabled>Continue</button>
+            </div>
+            <p id="save-info" class="text-xs text-gray-500 mt-6"></p>
+        </div>
+    </div>
+
+    <!-- Game Over / Win overlay -->
+    <div id="end-screen" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black bg-opacity-95 p-4">
+        <div class="card max-w-lg w-full p-8 text-center border-t-4 border-amber-500">
+            <h2 id="end-title" class="text-3xl font-cinzel text-amber-300 mb-4"></h2>
+            <p id="end-desc" class="text-gray-300 mb-6"></p>
+            <button id="btn-restart" class="btn btn-primary font-cinzel py-2 px-8 rounded-lg">Start Over</button>
+        </div>
+    </div>
+
+    <div id="game-container" class="container mx-auto p-4 md:p-8 relative z-10 hidden">
+        <header class="text-center mb-6 border-b-2 border-amber-800 pb-4">
+            <h1 class="text-3xl md:text-5xl font-cinzel font-bold text-amber-200 tracking-widest">COSA NOSTRA</h1>
+            <p class="text-amber-400">A GENERATIONAL SAGA</p>
+        </header>
+
+        <!-- HUD -->
+        <div class="bg-black bg-opacity-60 p-4 md:p-6 rounded-lg shadow-lg mb-6 sticky top-0 z-40 backdrop-blur-sm border border-gray-800">
+            <div id="game-state-display" class="flex flex-wrap justify-center gap-x-6 gap-y-3 text-center mb-4">
+                <div>
+                    <p class="text-xs text-gray-400 font-cinzel uppercase">Year</p>
+                    <p id="year-display" class="text-xl font-bold text-white">1946</p>
+                    <p id="era-display" class="text-[10px] text-amber-500 font-bold uppercase mt-0.5">The Golden Age</p>
+                </div>
+                <div><p class="text-xs text-gray-400 font-cinzel uppercase">Family</p><p id="family-size-display" class="text-xl font-bold text-white">1</p></div>
+                <div><p class="text-xs text-gray-400 font-cinzel uppercase">Dirty</p><p id="dirty-display" class="text-xl font-bold text-red-400">$10,000</p></div>
+                <div><p class="text-xs text-gray-400 font-cinzel uppercase">Clean</p><p id="clean-display" class="text-xl font-bold text-green-400">$20,000</p></div>
+                <div><p class="text-xs text-gray-400 font-cinzel uppercase">Favors</p><p id="favors-display" class="text-xl font-bold text-amber-400">0</p></div>
+                <div><p class="text-xs text-gray-400 font-cinzel uppercase">Income/Yr</p><p id="income-display" class="text-sm font-bold text-gray-200">-</p></div>
+                <div><p class="text-xs text-gray-400 font-cinzel uppercase">Heat</p><p id="heat-display" class="text-xl font-bold text-white">0</p></div>
+                <div><p class="text-xs text-gray-400 font-cinzel uppercase">RICO Case</p><p id="case-file-display" class="text-xl font-bold text-white">0%</p></div>
+            </div>
+            <div id="controls" class="flex flex-wrap gap-2 justify-center">
+                <button id="street-crime-btn" class="btn btn-danger font-cinzel text-xs py-2 px-3 rounded-lg">Street Crime</button>
+                <button id="launder-btn" class="btn btn-secondary font-cinzel text-xs py-2 px-3 rounded-lg">Launder</button>
+                <button id="bribe-btn" class="btn btn-intel font-cinzel text-xs py-2 px-3 rounded-lg">Bribe Police</button>
+                <button id="favor-btn" class="btn btn-primary font-cinzel text-xs py-2 px-3 rounded-lg" disabled>Favor</button>
+                <button id="estate-btn" class="btn btn-secondary font-cinzel text-xs py-2 px-3 rounded-lg">Estate</button>
+                <button id="commission-btn" class="btn btn-secondary font-cinzel text-xs py-2 px-3 rounded-lg">Commission</button>
+                <button id="rival-intel-btn" class="btn btn-danger font-cinzel text-xs py-2 px-3 rounded-lg">Rival Intel</button>
+                <button id="old-country-btn" class="btn btn-secondary font-cinzel text-xs py-2 px-3 rounded-lg">Old Country</button>
+                <button id="offshore-btn" class="btn btn-intel font-cinzel text-xs py-2 px-3 rounded-lg hidden">Swiss Bank</button>
+                <button id="map-btn" class="btn btn-secondary font-cinzel text-xs py-2 px-3 rounded-lg">City Map</button>
+                <button id="national-btn" class="btn btn-intel font-cinzel text-xs py-2 px-3 rounded-lg hidden">National</button>
+                <button id="recruit-btn" class="btn btn-primary font-cinzel text-xs py-2 px-3 rounded-lg">Recruit</button>
+                <button id="help-btn" class="btn btn-secondary font-cinzel text-xs py-2 px-3 rounded-lg">?</button>
+                <button id="next-year-btn" class="btn btn-primary font-cinzel text-xs py-2 px-4 rounded-lg ring-2 ring-amber-600">Next Year ▶</button>
+            </div>
+        </div>
+
+        <div id="log-message" class="text-center text-amber-300 italic my-3 min-h-[1.5rem] text-base font-medium px-4"></div>
+
+        <!-- Tutorial tip -->
+        <div id="tutorial-banner" class="hidden mb-6 bg-amber-900 bg-opacity-30 border border-amber-700 rounded-lg p-4 text-sm text-amber-100">
+            <strong class="font-cinzel text-amber-300">Getting Started:</strong>
+            Open the <strong>City Map</strong> to buy rackets, assign guards, and expand turf.
+            Use <strong>Recruit</strong> to grow your crew. Press <strong>Next Year</strong> to collect income and advance time.
+            <button id="dismiss-tutorial" class="ml-2 text-amber-400 underline text-xs">Dismiss</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+            <div>
+                <h2 class="text-2xl font-cinzel text-amber-300 border-b border-amber-700 pb-2 mb-4 uppercase">Family Legacy</h2>
+                <div id="legacy-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+            <div>
+                <h2 class="text-2xl font-cinzel text-amber-300 border-b border-amber-700 pb-2 mb-4 uppercase">Front Businesses</h2>
+                <div id="business-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+
+        <div id="opportunities-section" class="mb-10">
+            <h2 class="text-2xl font-cinzel text-amber-300 border-b border-amber-700 pb-2 mb-4 uppercase">Underworld Opportunities</h2>
+            <div id="opportunities-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+
+        <div id="influence-section" class="mb-10">
+            <h2 class="text-2xl font-cinzel text-amber-300 border-b border-amber-700 pb-2 mb-4 uppercase">City Influence</h2>
+            <div id="influence-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+        </div>
+
+        <div class="mb-16">
+            <h2 class="text-2xl font-cinzel text-amber-300 border-b border-amber-700 pb-2 mb-4 uppercase">The Family Roster</h2>
+            <main id="family-roster" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></main>
+        </div>
+
+        <footer class="text-center text-gray-600 text-xs pb-8">
+            Progress auto-saves each year · <span id="last-saved"></span>
+        </footer>
+    </div>
+
+    <div id="modal-container" class="hidden"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/year.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
