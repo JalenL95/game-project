@@ -1,0 +1,2779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosa Nostra: A Generational Saga</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c8a94a;
+            --gold-light: #e0c87a;
+            --gold-dark: #8a6d2f;
+            --dark-bg: #0f0f0f;
+            --card-bg: #1c1c1c;
+            --border: #333;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--dark-bg);
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(200,169,74,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(139,0,0,0.06) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.012'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            min-height: 100vh;
+            color: #e2e2e2;
+            position: relative;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            box-shadow: inset 0 0 200px rgba(0,0,0,0.7);
+            z-index: 1;
+        }
+
+        #game-container { position: relative; z-index: 2; }
+
+        .font-cinzel { font-family: 'Cinzel', serif; }
+
+        /* ---- CARDS ---- */
+        .card {
+            background: linear-gradient(145deg, #212121, #181818);
+            border: 1px solid #2e2e2e;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.7), 0 0 15px rgba(200,169,74,0.1);
+            border-color: #444;
+        }
+        .card-gold { border-color: var(--gold-dark) !important; box-shadow: 0 0 20px rgba(200,169,74,0.15), 0 4px 20px rgba(0,0,0,0.6) !important; }
+        .card-red { border-color: #7f1d1d !important; box-shadow: 0 0 15px rgba(185,28,28,0.15), 0 4px 20px rgba(0,0,0,0.6) !important; }
+
+        /* ---- BUTTONS ---- */
+        .btn {
+            cursor: pointer;
+            border-radius: 6px;
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+            transition: left 0.4s ease;
+        }
+        .btn:hover::after { left: 150%; }
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+        .btn:active:not(:disabled) { transform: translateY(0); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-primary {
+            background: linear-gradient(to bottom, #d4b96a, #a8893a);
+            color: #1a1208;
+            border-color: #8a6d2f;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(to bottom, #e0c87a, #b8994a);
+            box-shadow: 0 4px 20px rgba(200,169,74,0.3);
+        }
+        .btn-secondary {
+            background: linear-gradient(to bottom, #3a3a3a, #252525);
+            color: #d0d0d0;
+            border-color: #4a4a4a;
+        }
+        .btn-danger {
+            background: linear-gradient(to bottom, #c0392b, #922b21);
+            color: #fff;
+            border-color: #7b241c;
+        }
+        .btn-danger:hover:not(:disabled) { box-shadow: 0 4px 20px rgba(192,57,43,0.3); }
+        .btn-intel {
+            background: linear-gradient(to bottom, #2980b9, #1a5c8a);
+            color: #fff;
+            border-color: #154f7a;
+        }
+        .btn-intel:hover:not(:disabled) { box-shadow: 0 4px 20px rgba(41,128,185,0.3); }
+        .btn-action {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #aaa;
+            font-size: 0.68rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-action:hover { background: #c8a94a; color: #1a1208; border-color: #c8a94a; }
+        .btn-heir { background: linear-gradient(to bottom, #a8893a, #7a6228) !important; color: #fff !important; border-color: #7a6228 !important; }
+
+        /* ---- STAT BARS ---- */
+        .stat-bar { transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* ---- MODALS ---- */
+        .modal { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .modal-panel {
+            background: linear-gradient(145deg, #1e1e1e, #161616);
+            border: 1px solid #333;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        /* ---- MAP ---- */
+        #map-modal-content {
+            background-color: #0a1520;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+                repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px),
+                repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px);
+        }
+        .racket-icon {
+            position: absolute;
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.8);
+            box-shadow: 0 0 12px rgba(0,0,0,0.8);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            transform: translate(-50%, -50%);
+        }
+        .racket-icon.active-icon {
+            transform: translate(-50%, -50%) scale(1.5);
+            box-shadow: 0 0 20px rgba(255,255,255,0.5), 0 0 35px rgba(200,169,74,0.5);
+            z-index: 20;
+        }
+        .racket-icon:hover:not(.active-icon) {
+            transform: translate(-50%, -50%) scale(1.3);
+            box-shadow: 0 0 15px rgba(255,255,255,0.4);
+        }
+        .owner-player { background: radial-gradient(circle, #d4a24a, #8a5c1a); border-color: #f0c060; }
+        .owner-tattaglia-family { background: radial-gradient(circle, #e53e3e, #9b2c2c); }
+        .owner-barzini-family { background: radial-gradient(circle, #3182ce, #1a4d8a); }
+        .owner-stracci-family { background: radial-gradient(circle, #38a169, #1e6b42); }
+        .owner-cuneo-family { background: radial-gradient(circle, #805ad5, #5b21b6); }
+        .owner-uncontrolled { background: radial-gradient(circle, #718096, #4a5568); }
+
+        #map-info-panel {
+            position: absolute; right: 0; top: 0;
+            width: 290px; height: 100%;
+            background: rgba(14, 14, 14, 0.97);
+            border-left: 1px solid #3a3a3a;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 30;
+            overflow-y: auto;
+        }
+        #map-info-panel.visible { transform: translateX(0); }
+
+        /* ---- NEWSPAPER ---- */
+        #newspaper-modal-content {
+            background-color: #f8f0dc;
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+            color: #1a1a1a;
+            font-family: 'Georgia', serif;
+        }
+        #newspaper-masthead {
+            font-family: 'Cinzel', serif;
+            letter-spacing: 0.15em;
+        }
+        #newspaper-headline {
+            font-family: 'Georgia', serif;
+            font-size: 1.8rem;
+            line-height: 1.15;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* ---- NOTIFICATION TOASTS ---- */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 8px;
+            pointer-events: none;
+            max-width: 360px;
+        }
+        .toast {
+            background: linear-gradient(135deg, #1e1e1e, #141414);
+            border: 1px solid #3a3a3a;
+            border-left: 4px solid #c8a94a;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            color: #d0d0d0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            animation: toastIn 0.3s ease;
+            pointer-events: none;
+        }
+        .toast.toast-danger { border-left-color: #c0392b; }
+        .toast.toast-success { border-left-color: #27ae60; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(20px); } }
+
+        /* ---- INTRO SCREEN ---- */
+        #intro-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            background: #0a0a0a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #intro-screen .title-glow {
+            text-shadow: 0 0 30px rgba(200,169,74,0.4), 0 0 60px rgba(200,169,74,0.2), 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .divider-ornament {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--gold-dark);
+        }
+        .divider-ornament::before, .divider-ornament::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--gold-dark), transparent);
+        }
+
+        /* ---- RICO METER ---- */
+        .rico-low { color: #68d391 !important; }
+        .rico-med { color: #f6e05e !important; }
+        .rico-high { color: #fc8181 !important; animation: pulse-red 1.5s infinite; }
+        @keyframes pulse-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+        /* ---- SCROLLBAR ---- */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c8a94a; }
+
+        /* ---- MISC ---- */
+        .section-header {
+            font-family: 'Cinzel', serif;
+            color: #c8a94a;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, #3a2a0a, transparent);
+        }
+
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #1a1a1a;
+            border: 1px solid #2e2e2e;
+            border-radius: 8px;
+            padding: 8px 16px;
+        }
+
+        select {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            color: #d0d0d0;
+            border-radius: 6px;
+            padding: 6px 10px;
+        }
+        select:focus { outline: none; border-color: #c8a94a; }
+
+        input[type="text"] {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            color: #fff;
+            border-radius: 6px;
+            padding: 8px 12px;
+        }
+        input[type="text"]:focus { outline: none; border-color: #c8a94a; box-shadow: 0 0 0 2px rgba(200,169,74,0.15); }
+
+        label { cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- INTRO SCREEN -->
+<div id="intro-screen">
+    <div class="text-center px-8 max-w-2xl">
+        <p class="text-xs tracking-widest text-amber-700 font-cinzel mb-4 uppercase">New York City, 1946</p>
+        <h1 class="text-6xl md:text-8xl font-cinzel font-black text-amber-200 title-glow tracking-wider mb-2">COSA NOSTRA</h1>
+        <div class="divider-ornament my-4"><span class="text-amber-700 text-xl">✦</span></div>
+        <p class="text-amber-500 font-cinzel text-lg tracking-widest uppercase mb-12">A Generational Saga</p>
+
+        <div class="max-w-sm mx-auto space-y-4">
+            <div>
+                <p class="text-xs text-gray-500 uppercase tracking-widest mb-2 text-left">Your Family Name</p>
+                <input type="text" id="family-name-input" placeholder="e.g. Corleone" maxlength="20"
+                    class="w-full text-center text-xl font-cinzel text-amber-200 bg-black border border-amber-900 py-3 rounded-lg focus:border-amber-600"
+                    style="background:#0a0a0a;">
+            </div>
+            <div>
+                <p class="text-xs text-gray-500 uppercase tracking-widest mb-2 text-left">Your Don's First Name</p>
+                <input type="text" id="don-name-input" placeholder="e.g. Vito" maxlength="15"
+                    class="w-full text-center text-xl font-cinzel text-amber-200 bg-black border border-amber-900 py-3 rounded-lg focus:border-amber-600"
+                    style="background:#0a0a0a;">
+            </div>
+            <button id="start-game-btn" class="btn btn-primary w-full py-4 text-base mt-4 font-cinzel" style="font-size:0.95rem;letter-spacing:0.15em;">
+                BEGIN THE SAGA
+            </button>
+            <button id="continue-game-btn" class="btn btn-secondary w-full py-3 text-xs font-cinzel" style="letter-spacing:0.1em;" id="continue-btn">
+                CONTINUE SAVED GAME
+            </button>
+        </div>
+        <p class="text-gray-700 text-xs mt-8">Build your empire from a single street corner to the heights of power.</p>
+    </div>
+</div>
+
+<!-- MAIN GAME CONTAINER -->
+<div id="game-container" class="container mx-auto p-4 md:p-6 hidden">
+
+    <header class="text-center mb-6 pt-2">
+        <div class="divider-ornament mb-2"><span class="text-amber-800 text-sm">✦</span></div>
+        <h1 id="dynasty-title" class="text-3xl md:text-5xl font-cinzel font-black text-amber-200 tracking-widest" style="text-shadow: 0 0 40px rgba(200,169,74,0.2)">THE FAMILY</h1>
+        <p class="text-amber-600 text-xs font-cinzel tracking-widest mt-1">COSA NOSTRA • A GENERATIONAL SAGA</p>
+        <div class="divider-ornament mt-2"><span class="text-amber-800 text-sm">✦</span></div>
+    </header>
+
+    <!-- HUD -->
+    <div class="card rounded-xl p-5 mb-6 border border-gray-800">
+        <div class="flex flex-wrap justify-between gap-4 mb-4">
+            <!-- Stats -->
+            <div class="flex flex-wrap gap-3 flex-1">
+                <div class="stat-badge">
+                    <span class="text-xs text-gray-500 font-cinzel uppercase">Year</span>
+                    <span id="year-display" class="text-xl font-bold text-white font-cinzel">1946</span>
+                    <span id="era-display" class="text-[10px] text-amber-600 font-bold uppercase ml-1"></span>
+                </div>
+                <div class="stat-badge">
+                    <span class="text-xs text-gray-500">Gen</span>
+                    <span id="gen-display" class="text-lg font-bold text-amber-400">I</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="text-xs text-gray-500">Crew</span>
+                    <span id="family-size-display" class="text-lg font-bold text-white">1</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="text-xs text-red-500">●</span>
+                    <span class="text-xs text-gray-500">Dirty</span>
+                    <span id="dirty-display" class="text-lg font-bold text-red-400">$10,000</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="text-xs text-green-500">●</span>
+                    <span class="text-xs text-gray-500">Clean</span>
+                    <span id="clean-display" class="text-lg font-bold text-green-400">$20,000</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="text-xs text-amber-500">★</span>
+                    <span class="text-xs text-gray-500">Favors</span>
+                    <span id="favors-display" class="text-lg font-bold text-amber-400">0</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="text-xs text-gray-500">Income/yr</span>
+                    <span id="income-display" class="text-sm font-bold text-gray-300">—</span>
+                </div>
+                <div class="stat-badge">
+                    <span class="text-xs text-orange-500">🌡</span>
+                    <span class="text-xs text-gray-500">Heat</span>
+                    <span id="heat-display" class="text-lg font-bold text-white">0</span>
+                </div>
+                <div class="stat-badge" id="rico-badge">
+                    <span class="text-xs text-gray-500 font-cinzel">RICO</span>
+                    <span id="case-file-display" class="text-lg font-bold rico-low">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap gap-2">
+            <button id="street-crime-btn" class="btn btn-danger py-2 px-3 text-xs">Street Crime</button>
+            <button id="launder-btn" class="btn btn-secondary py-2 px-3 text-xs">Launder Cash</button>
+            <button id="bribe-btn" class="btn btn-intel py-2 px-3 text-xs">Bribe Police</button>
+            <button id="favor-btn" class="btn btn-primary py-2 px-3 text-xs" disabled>★ Call a Favor</button>
+            <button id="estate-btn" class="btn btn-secondary py-2 px-3 text-xs">The Estate</button>
+            <button id="commission-btn" class="btn btn-secondary py-2 px-3 text-xs">The Commission</button>
+            <button id="rival-intel-btn" class="btn btn-danger py-2 px-3 text-xs">Rival Intel</button>
+            <button id="old-country-btn" class="btn btn-secondary py-2 px-3 text-xs">The Old Country</button>
+            <button id="offshore-btn" class="btn btn-intel py-2 px-3 text-xs hidden" style="border:1px solid #2563eb;">Swiss Bank</button>
+            <button id="map-btn" class="btn btn-secondary py-2 px-3 text-xs">🗺 City Map</button>
+            <button id="national-btn" class="btn btn-intel py-2 px-3 text-xs hidden">National Map</button>
+            <button id="recruit-btn" class="btn btn-primary py-2 px-3 text-xs">Recruit</button>
+            <button id="next-year-btn" class="btn btn-secondary py-2 px-3 text-xs font-bold" style="border-color:#555;">⏩ Next Year</button>
+        </div>
+    </div>
+
+    <!-- Log Message -->
+    <div id="log-message" class="text-center text-amber-400 italic mb-4 h-5 text-sm font-medium tracking-wide"></div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+        <div>
+            <div class="section-header">Family Legacy</div>
+            <div id="legacy-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </div>
+        <div>
+            <div class="section-header">Front Businesses</div>
+            <div id="business-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </div>
+    </div>
+
+    <div class="mb-10">
+        <div class="section-header">Underworld Operations</div>
+        <div id="opportunities-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+
+    <div class="mb-10">
+        <div class="section-header">City Influence</div>
+        <div id="influence-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+    </div>
+
+    <div class="mb-16">
+        <div class="section-header">The Family Roster</div>
+        <div id="family-roster" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+    </div>
+</div>
+
+<!-- Modal Container -->
+<div id="modal-container" class="hidden"></div>
+
+<script>
+// =====================================================================
+//  CONFIGURATION
+// =====================================================================
+const GAME_CONFIG = {
+    firstNames: ["Vito","Sonny","Michael","Fredo","Tom","Luca","Peter","Sal","Paulie","Rocco","Gino","Marco","Angelo","Nico","Carmine","Dante","Enzo","Tony","Carlo","Richie","Bruno","Leo","Joey","Nicky","Frankie"],
+    lastNames: ["Corleone","Tattaglia","Barzini","Stracci","Cuneo","Brasi","Clemenza","Tessio","Gatto","Lampone","Cicci","Neri","Hagen","Soprano","Luciano","Gambino"],
+    traits: {
+        Ambitious:  { description: "Gains stats faster, but loses loyalty when Idle." },
+        Loyal:      { description: "Loyalty is very high and decays slowly." },
+        Gambler:    { description: "May gamble away family money each year." },
+        Deceitful:  { description: "Low starting loyalty, may steal from rackets." },
+        Brute:      { description: "High Brawn, but low Brains." },
+        Legend:     { description: "A supremely skilled underworld legend." },
+        Leader:     { description: "Inspires the crew. Provides a morale boost." }
+    },
+    rivalFamilies: [
+        { name: "Tattaglia Family", color: "border-red-700",     textColor: "text-red-400",     personality: 'Aggressive',   bgColor: 'bg-red-900'    },
+        { name: "Barzini Family",   color: "border-blue-700",    textColor: "text-blue-400",    personality: 'Cunning',      bgColor: 'bg-blue-900'   },
+        { name: "Stracci Family",   color: "border-emerald-700", textColor: "text-emerald-400", personality: 'Defensive',    bgColor: 'bg-emerald-900'},
+        { name: "Cuneo Family",     color: "border-purple-700",  textColor: "text-purple-400",  personality: 'Opportunist',  bgColor: 'bg-purple-900' }
+    ],
+    neighborhoods: [
+        { id: 'little-italy', name: 'Little Italy' },
+        { id: 'docks',        name: 'The Docks'     },
+        { id: 'midtown',      name: 'Midtown'       }
+    ],
+    availableRackets: [
+        { id:1, name:"Speakeasy",        neighborhoodId:'little-italy', cost:10000,  baseIncome:3500,  defense:200,  requires:{type:'Brains',stat:40}, mapCoordinates:{x:'18%',y:'18%'}, supplyRequired:null },
+        { id:4, name:"Loan Sharking",    neighborhoodId:'little-italy', cost:15000,  baseIncome:5000,  defense:300,  requires:{type:'Brains',stat:50}, mapCoordinates:{x:'38%',y:'28%'}, supplyRequired:null },
+        { id:3, name:"Protection Racket",neighborhoodId:'docks',        cost:50000,  baseIncome:15000, defense:1000, requires:{type:'Brawn', stat:60}, mapCoordinates:{x:'12%',y:'72%'}, supplyRequired:null },
+        { id:6, name:"Smuggling Ring",   neighborhoodId:'docks',        cost:80000,  baseIncome:22000, defense:1200, requires:{type:'Brawn', stat:70}, mapCoordinates:{x:'30%',y:'84%'}, supplyRequired:null },
+        { id:2, name:"Gambling Den",     neighborhoodId:'midtown',      cost:25000,  baseIncome:8000,  defense:500,  requires:{type:'Brains',stat:55}, mapCoordinates:{x:'62%',y:'32%'}, supplyRequired:null },
+        { id:5, name:"Casino Front",     neighborhoodId:'midtown',      cost:100000, baseIncome:25000, defense:1500, requires:{type:'Brains',stat:75}, mapCoordinates:{x:'82%',y:'58%'}, supplyRequired:6   },
+        { id:7, name:"Narcotics Trade",  neighborhoodId:'midtown',      cost:150000, baseIncome:50000, defense:800,  requires:{type:'Brains',stat:60}, mapCoordinates:{x:'52%',y:'48%'}, supplyRequired:6, unlockYear:1960 }
+    ],
+    genericModules: [
+        { id:'vault',  name:'Secret Vault',   desc:'+250 Defense against rival raids.',            cost:30000 },
+        { id:'vip',    name:'VIP Lounge',     desc:'+100% Base Income (needs Capo+ assigned).',    cost:40000 },
+        { id:'tunnel', name:'Escape Tunnel',  desc:'Guards survive cleanly if racket is seized.',  cost:20000 },
+        { id:'armory', name:'The Armory',     desc:'All assigned guards gain +20 Brawn.',          cost:35000 }
+    ],
+    uniqueModules: {
+        1:{ id:'speakeasy_perk', name:'High Society',        desc:'Generates $2,000 extra Clean Cash yearly.',           cost:25000 },
+        4:{ id:'loanshark_perk', name:'Predatory Lending',   desc:'Recruiting new members costs 25% less.',              cost:25000 },
+        3:{ id:'protection_perk',name:'Garrison',            desc:'All player rackets gain +200 Defense globally.',      cost:50000 },
+        6:{ id:'smuggling_perk', name:'Ghost Ships',         desc:'Bribing the Police costs 25% less Clean Cash.',       cost:40000 },
+        2:{ id:'gambling_perk',  name:'Backroom Wash',       desc:'Increases laundering cap by $10,000/yr.',             cost:30000 },
+        5:{ id:'casino_perk',    name:'The Vault',           desc:'100% of Casino income becomes Clean Cash.',           cost:75000 },
+        7:{ id:'narco_perk',     name:'Cartel Connections',  desc:'Old Country Remittances grant +20 Standing.',         cost:50000 }
+    },
+    laws: [
+        { id:'narcotics_ban',     name:"The Narcotics Ban",     desc:"Owning Narcotics Trade reduces standing with all families each year." },
+        { id:'omerta_pact',       name:"Pact of Omertà",        desc:"RICO Case builds 50% slower. Informant events more likely." },
+        { id:'war_tax',           name:"The War Tax",           desc:"Declaring war costs an extra $10k Dirty to the Commission." },
+        { id:'mandatory_tribute', name:"Mandatory Tribute",     desc:"All families passively gain +5 Standing, but Heat decays 50% slower." }
+    ],
+    influenceTargets: [
+        { id:'mayor',  name:"The Mayor's Office", totalCost:500000, bonus:'All racket income +20%.'},
+        { id:'police', name:"The Police Chief",   totalCost:350000, bonus:'Rackets generate no Heat. Bribes cost 50% less.'},
+        { id:'union',  name:"The Union Boss",     totalCost:400000, bonus:'Unlock "Call a Strike" — shuts down a rival family\'s rackets for one year.'}
+    ],
+    legacyPerks: [
+        { id:'blood_of_the_don', generation:2, name:'Blood of the Don',   description:'Children born into the family have higher potential (+5 to all base stats).'},
+        { id:'political_animal', generation:3, name:'Political Animal',   description:'Your family excels at manipulation. All influence investments are 10% more effective.'}
+    ],
+    businessFronts: [
+        { id:'bakery',       name:'La Bella Bakery',          cost:15000,  income:1000,  launderCap:5000  },
+        { id:'olive_oil',    name:'Genco Olive Oil',          cost:25000,  income:2000,  launderCap:10000 },
+        { id:'construction', name:'Corleone Construction',    cost:75000,  income:5000,  launderCap:25000 },
+        { id:'import_export',name:'Oceanic Import/Export',    cost:200000, income:15000, launderCap:60000 }
+    ],
+    specialOperations: [
+        { id:'bank_heist',         name:'Bank Heist',               description:'A daring raid on the First National Bank. High reward, extreme risk.',              cost:25000, risk:40, reward:{cash:200000},           heat:80, caseFile:20, requirements:{stat:'Guts',   total:200} },
+        { id:'warehouse_raid',     name:'Raid Rival Warehouse',     description:'Hit a rival stash house for raw cash.',                                              cost:5000,  risk:30, reward:{cash:40000},            heat:40, caseFile:10, requirements:{stat:'Brawn',  total:120} },
+        { id:'art_theft',          name:'Museum Art Theft',         description:'Steal priceless art for the black market. Requires delicate hands.',                cost:15000, risk:35, reward:{cash:100000},           heat:50, caseFile:15, requirements:{stat:'Brains', total:180} },
+        { id:'political_blackmail',name:'Blackmail Politician',     description:'Dig up dirt on a city councilman and use it for influence.',                        cost:10000, risk:20, reward:{influence:50000,target:'mayor'}, heat:30, caseFile:10, requirements:{stat:'Brains', total:150} },
+        { id:'mayor_dirty_work',   name:"Mayor's Dirty Work",      description:"Silence a loudmouth reporter. The Mayor will owe you a massive Favor.",             cost:5000,  risk:25, reward:{favors:1},             heat:20, caseFile:5,  requirements:{stat:'Brawn',  total:150} },
+        { id:'union_busting',      name:'Union Busting',            description:'Break up a dock strike for the local Baron. A Favor is worth the heat.',           cost:2000,  risk:15, reward:{favors:1},             heat:15, caseFile:5,  requirements:{stat:'Brawn',  total:100} }
+    ],
+    events: [
+        { title:"The Informant", description:"A low-level associate is talking to the Feds. How do you handle it?", choices:[
+            { text:"Bury him ($5k Dirty)",  effect:()=>{ if(gameState.dirtyMoney>=5000){gameState.dirtyMoney-=5000;showToast("Problem quietly solved.");} else showToast("Not enough cash. He keeps talking.","danger"); } },
+            { text:"Ignore it (Heat +20)",  effect:()=>{ gameState.heat+=20; showToast("The Feds are watching closer now.","danger"); } }
+        ]},
+        { title:"Prohibition Ending", description:"Rumors suggest prohibition is nearing an end. Prices are volatile.", choices:[
+            { text:"Stockpile Goods ($20k Dirty)", effect:()=>{ if(gameState.dirtyMoney>=20000){gameState.dirtyMoney-=20000;gameState.rackets.forEach(r=>r.baseIncome=Math.round(r.baseIncome*1.2));showToast("Inventory secured. Income boosted.");} else showToast("Can't afford the stockpile.","danger"); } },
+            { text:"Liquidate Assets (+$15k)",     effect:()=>{ gameState.dirtyMoney+=15000; showToast("Quick cash, but future lost."); } }
+        ]},
+        { title:"Internal Dispute", description:"Two Capos are arguing over their cut from the docks. Blood may be spilled.", choices:[
+            { text:"Demand peace, split it evenly",  effect:()=>{ gameState.members.forEach(m=>{if(m.role==='Capo')m.stats.loyalty=Math.max(0,m.stats.loyalty-5);}); showToast("Neither is happy, but peace holds."); } },
+            { text:"Pay them off ($15k Dirty)",      effect:()=>{ if(gameState.dirtyMoney>=15000){gameState.dirtyMoney-=15000;showToast("Money silences all grievances.");}else{showToast("Couldn't pay. Tensions explode.","danger");gameState.members.forEach(m=>{if(m.role==='Capo')m.stats.loyalty-=10;});} } },
+            { text:"Tell them to shut up",           effect:()=>{ gameState.members.forEach(m=>{if(m.role==='Capo')m.stats.loyalty=Math.max(0,m.stats.loyalty-15);}); showToast("The Capos lose respect for you.","danger"); } }
+        ]},
+        { title:"A Made Man's Wedding", description:"One of your Made Men is getting married. Attending costs money but builds loyalty.", choices:[
+            { text:"Attend lavishly ($10k Clean)",   effect:()=>{ if(gameState.cleanMoney>=10000){gameState.cleanMoney-=10000;gameState.members.forEach(m=>{if(m.isMadeMan)m.stats.loyalty=Math.min(100,m.stats.loyalty+10);});showToast("A beautiful wedding. The crew is inspired.");} } },
+            { text:"Send a card and skip it",        effect:()=>{ gameState.members.forEach(m=>{if(m.isMadeMan)m.stats.loyalty=Math.max(0,m.stats.loyalty-5);}); showToast("They notice your absence.","danger"); } }
+        ]},
+        { title:"Street War Flares Up", description:"A rival crew hit one of our corners. Street soldiers are demanding blood.", choices:[
+            { text:"Retaliate hard (Heat +30, +Loyalty)", effect:()=>{ gameState.heat+=30;gameState.members.forEach(m=>{if(!m.isBoss)m.stats.loyalty=Math.min(100,m.stats.loyalty+10);});showToast("Blood for blood. The crew respects you."); } },
+            { text:"Stand down, avoid heat",              effect:()=>{ gameState.members.forEach(m=>{if(!m.isBoss)m.stats.loyalty=Math.max(0,m.stats.loyalty-8);}); showToast("The crew grumbles about weakness.","danger"); } }
+        ]}
+    ],
+    RECRUIT_COST:2500, UPKEEP_COST_PER_MEMBER:200, MADE_MAN_UPKEEP_COST:600, CAPO_UPKEEP_COST:1200, CONSIGLIERE_UPKEEP_COST:2500, MADE_MAN_YEARS_REQ:10,
+    EVENT_CHANCE_PER_YEAR:0.35, RIVAL_ATTACK_CHANCE:0.15,
+    HEAT_PER_RACKET:1, HEAT_DECAY:5, BRIBE_BASE_COST:15000, INFLUENCE_INVESTMENT:30000,
+    MAX_CASE_FILE:100, RICO_TRIAL_THRESHOLD:100, CHANCE_OF_CHILD:0.15
+};
+
+// =====================================================================
+//  GAME STATE
+// =====================================================================
+let gameState = {
+    year:1946, era:'The Golden Age',
+    dirtyMoney:10000, cleanMoney:20000, favors:0,
+    offshore:0, pendingWithdrawal:0,
+    members:[], rackets:[], rivals:[], heat:0, caseFile:0,
+    influence:{mayor:0,police:0,union:0},
+    activeBonuses:{'little-italy':false,'midtown':false,'docks':false},
+    generation:1, unlockedLegacyPerks:[], ownedBusinesses:[], currentOpportunities:[],
+    lastYearEvents:[], oldCountryStanding:0,
+    estate:{owned:false,walls:false,parties:false,safe:false},
+    expeditions:{vegas:null,miami:null},
+    activeLaw:null, isBossOfBosses:false,
+    familyName:'', donFirstName:'',
+    ricoTrialTriggered:false
+};
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+const toRomanNumeral = n => {
+    const vals = [1000,900,500,400,100,90,50,40,10,9,5,4,1];
+    const syms = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
+    let r=''; vals.forEach((v,i)=>{while(n>=v){r+=syms[i];n-=v;}});
+    return r;
+};
+
+// =====================================================================
+//  UTILITY FUNCTIONS
+// =====================================================================
+function getRandomInt(min, max) { return Math.floor(Math.random()*(max-min+1))+min; }
+
+let _logTimeout;
+function updateLog(msg, isImportant=false) {
+    const el = $('#log-message');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = `text-center italic mb-4 h-5 text-sm font-medium tracking-wide transition-all ${isImportant ? 'text-red-400 font-bold' : 'text-amber-400'}`;
+    clearTimeout(_logTimeout);
+    _logTimeout = setTimeout(()=>{ el.textContent=''; }, 5000);
+}
+
+let _toastQueue = [];
+function showToast(msg, type='normal') {
+    const container = $('#toast-container');
+    const el = document.createElement('div');
+    el.className = `toast ${type==='danger'?'toast-danger':type==='success'?'toast-success':''}`;
+    el.textContent = msg;
+    container.appendChild(el);
+    setTimeout(()=>{
+        el.style.animation='toastOut 0.3s ease forwards';
+        setTimeout(()=>el.remove(), 300);
+    }, 3500);
+    // Keep max 4 toasts
+    const toasts = container.querySelectorAll('.toast');
+    if (toasts.length > 4) toasts[0].remove();
+}
+
+function closeModal() {
+    const mc = $('#modal-container');
+    mc.innerHTML = '';
+    mc.classList.add('hidden');
+}
+
+function hasInstalledModule(modId) {
+    return gameState.rackets.some(r => r.owner==='player' && r.shutdown<gameState.year && r.modules && r.modules.includes(modId));
+}
+
+function saveGame() {
+    try { localStorage.setItem('cosanostra_save', JSON.stringify(gameState)); } catch(e) {}
+}
+
+function loadGame() {
+    try {
+        const s = localStorage.getItem('cosanostra_save');
+        if (s) { gameState = JSON.parse(s); return true; }
+    } catch(e) {}
+    return false;
+}
+
+// =====================================================================
+//  INCOME & DEFENSE CALCULATIONS
+// =====================================================================
+function calculateIncome(owner) {
+    let dirty=0, clean=0, launderCap=0;
+
+    // Business fronts
+    gameState.ownedBusinesses.forEach(bizId => {
+        const biz = GAME_CONFIG.businessFronts.find(b=>b.id===bizId);
+        if (biz) { clean+=biz.income; launderCap+=biz.launderCap; }
+    });
+
+    // Backroom Wash module boosts launder cap
+    if (hasInstalledModule('gambling_perk')) launderCap += 10000;
+
+    // High Society perk: +2k clean
+    if (hasInstalledModule('speakeasy_perk')) clean += 2000;
+
+    const mayorTarget = GAME_CONFIG.influenceTargets.find(t=>t.id==='mayor');
+    const mayorMaxed = gameState.influence.mayor >= mayorTarget.totalCost;
+    const hasCasinoVault = hasInstalledModule('casino_perk');
+
+    // Racket income
+    gameState.rackets.forEach(r => {
+        if (r.owner !== owner || r.shutdown >= gameState.year) return;
+
+        let income = r.baseIncome;
+
+        // VIP Lounge: doubles income if Capo or higher is assigned
+        if (r.modules && r.modules.includes('vip')) {
+            const hasCapo = r.assignedMembers.some(mid => {
+                const m = gameState.members.find(x=>x.id===mid);
+                return m && (m.role==='Capo'||m.role==='Underboss'||m.role==='Consigliere');
+            });
+            if (hasCapo) income *= 2;
+        }
+
+        // Supply chain check (Casino & Narcotics need Smuggling Ring)
+        if (r.supplyRequired === 6) {
+            const hasSmuggler = gameState.rackets.some(rack => rack.id===6 && rack.owner==='player' && rack.shutdown<gameState.year);
+            if (!hasSmuggler) income *= 0.5;
+        }
+
+        // Mayor influence: +20% to all income
+        if (mayorMaxed) income = Math.round(income * 1.2);
+
+        // Casino Vault module: casino income becomes clean
+        if (r.id===5 && hasCasinoVault) {
+            clean += income;
+        } else {
+            dirty += income;
+        }
+    });
+
+    // Expedition income
+    if (gameState.expeditions.vegas) {
+        const b = gameState.members.find(m=>m.id===gameState.expeditions.vegas);
+        if (b && b.stats.loyalty >= 30) clean += 50000;
+    }
+    if (gameState.expeditions.miami) {
+        const b = gameState.members.find(m=>m.id===gameState.expeditions.miami);
+        if (b && b.stats.loyalty >= 30) dirty += 75000;
+    }
+
+    return { dirty: Math.round(dirty), clean: Math.round(clean), launderCap: Math.round(launderCap) };
+}
+
+function getRacketDefense(racket) {
+    let defense = racket.defense || 0;
+
+    racket.assignedMembers.forEach(mid => {
+        const m = gameState.members.find(x=>x.id===mid);
+        if (m) {
+            let brawn = m.stats.brawn;
+            if (racket.modules && racket.modules.includes('armory')) brawn += 20;
+            defense += brawn;
+        }
+    });
+
+    if (racket.modules && racket.modules.includes('vault')) defense += 250;
+    if (hasInstalledModule('protection_perk')) defense += 200;
+
+    return defense;
+}
+
+// =====================================================================
+//  RENDER FUNCTIONS
+// =====================================================================
+function renderFamilyRoster() {
+    const roster = $('#family-roster');
+    if (!roster) return;
+    roster.innerHTML = '';
+
+    gameState.members.forEach(m => {
+        const card = document.createElement('div');
+
+        // Youth card
+        if (m.age < 18) {
+            card.className = 'card rounded-xl p-4 border border-gray-800 opacity-70';
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <p class="font-bold text-gray-400 text-sm">${m.name}</p>
+                        <p class="text-[10px] text-gray-600">Age: ${m.age}</p>
+                    </div>
+                    <span class="text-[10px] bg-gray-800 text-gray-500 px-2 py-0.5 rounded font-bold uppercase">Youth</span>
+                </div>
+                <div class="h-1 bg-gray-800 rounded mb-1">
+                    <div class="h-1 bg-amber-800 rounded stat-bar" style="width:${(m.age/18)*100}%"></div>
+                </div>
+                <p class="text-[10px] text-gray-600">Comes of age in ${18-m.age} year(s)</p>
+            `;
+            roster.appendChild(card);
+            return;
+        }
+
+        // Incarcerated
+        if (m.unavailableUntil > gameState.year) {
+            card.className = 'card rounded-xl p-4 border border-red-900 opacity-60';
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <p class="font-bold text-gray-400 text-sm">${m.name}</p>
+                        <p class="text-[10px] text-gray-600">Age: ${m.age}</p>
+                    </div>
+                    <span class="text-[10px] bg-red-950 text-red-500 px-2 py-0.5 rounded font-bold uppercase">Prison</span>
+                </div>
+                <p class="text-xs text-red-500">Released in ${m.unavailableUntil-gameState.year} year(s)</p>
+                ${gameState.favors>0?`<button class="btn btn-primary w-full mt-2 py-1 text-[10px]" onclick="openFavorModal()">Call a Favor (Pardon)</button>`:''}
+            `;
+            roster.appendChild(card);
+            return;
+        }
+
+        // Role styling
+        let roleColor='text-gray-500', roleBg='bg-gray-800', borderClass='border-gray-800';
+        if (m.isBoss)              { roleColor='text-amber-300'; roleBg='bg-amber-950'; borderClass='border-amber-900'; }
+        else if (m.role==='Underboss')   { roleColor='text-orange-300'; roleBg='bg-orange-950'; borderClass='border-orange-900'; }
+        else if (m.role==='Consigliere') { roleColor='text-purple-300'; roleBg='bg-purple-950'; }
+        else if (m.role==='Capo')        { roleColor='text-blue-300';   roleBg='bg-blue-950';   }
+        else if (m.role==='Working')     { roleColor='text-green-400';  roleBg='bg-green-950';  }
+        else if (m.role==='Vegas Boss')  { roleColor='text-cyan-300';   roleBg='bg-cyan-950';   }
+        else if (m.role==='Miami Boss')  { roleColor='text-pink-300';   roleBg='bg-pink-950';   }
+
+        if (m.stats.loyalty < 20) borderClass = 'border-red-800';
+        if (m.isHeir) borderClass = 'border-amber-700';
+
+        const loyaltyColor = m.stats.loyalty>70?'bg-green-500':m.stats.loyalty>40?'bg-amber-500':'bg-red-600';
+        const loyaltyTextColor = m.stats.loyalty<30?'text-red-400 font-bold':'text-gray-400';
+
+        const assignedRacket = m.assignedRacketId ? gameState.rackets.find(r=>r.id===m.assignedRacketId) : null;
+
+        // Action buttons
+        let actions = '';
+        if (!m.isBoss) {
+            if (!m.isMadeMan && m.yearsInFamily>=GAME_CONFIG.MADE_MAN_YEARS_REQ && m.age>=18)
+                actions += `<button class="btn btn-action" style="background:#1a3a1a;border-color:#2d7a2d;color:#5adf5a;" onclick="makeMan(${m.id})">Make Man ★</button>`;
+            if (m.isMadeMan && m.role!=='Capo' && m.role!=='Underboss' && m.role!=='Consigliere' && m.role!=='Vegas Boss' && m.role!=='Miami Boss')
+                actions += `<button class="btn btn-action" onclick="promoteToCapo(${m.id})">→ Capo</button>`;
+            if (m.role==='Capo') {
+                actions += `<button class="btn btn-action" onclick="promoteToUnderboss(${m.id})">→ Underboss</button>`;
+                actions += `<button class="btn btn-action" onclick="promoteToConsigliere(${m.id})">→ Consigliere</button>`;
+            }
+            if (m.isMadeMan && !m.isHeir)
+                actions += `<button class="btn btn-action" onclick="designateHeir(${m.id})">Name Heir</button>`;
+            else if (m.isHeir)
+                actions += `<span class="btn btn-action btn-heir">★ Heir</span>`;
+        }
+
+        const traitInfo = GAME_CONFIG.traits[m.trait] || {};
+
+        card.className = `card rounded-xl p-4 border ${borderClass} ${m.isBoss?'card-gold':''}`;
+        card.innerHTML = `
+            <div class="flex justify-between items-start mb-3">
+                <div class="flex-1 min-w-0">
+                    <p class="font-bold text-white text-sm truncate">${m.name}</p>
+                    <p class="text-[10px] text-gray-600 mt-0.5">
+                        Age ${m.age} · 
+                        ${m.isMadeMan ? '<span class="text-amber-600">★ Made Man</span>' : `${m.yearsInFamily}/${GAME_CONFIG.MADE_MAN_YEARS_REQ}yr`}
+                    </p>
+                </div>
+                <div class="text-right ml-2 flex-shrink-0">
+                    <span class="text-[10px] ${roleColor} ${roleBg} px-2 py-0.5 rounded uppercase font-bold tracking-wider block">${m.role}</span>
+                    ${m.trait?`<span class="text-[9px] text-gray-600 italic block mt-0.5" title="${traitInfo.description||''}">${m.trait}</span>`:''}
+                </div>
+            </div>
+
+            <div class="space-y-1.5 mb-3">
+                ${['brawn','brains','guts'].map(stat=>{
+                    const colors = {brawn:'bg-red-600',brains:'bg-blue-500',guts:'bg-amber-500'};
+                    return `<div class="flex items-center gap-1.5">
+                        <span class="text-[10px] text-gray-600 w-9 capitalize">${stat}</span>
+                        <div class="flex-1 h-1.5 bg-gray-800 rounded overflow-hidden">
+                            <div class="h-1.5 ${colors[stat]} rounded stat-bar" style="width:${m.stats[stat]}%"></div>
+                        </div>
+                        <span class="text-[10px] text-gray-500 w-5 text-right">${m.stats[stat]}</span>
+                    </div>`;
+                }).join('')}
+                <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] text-gray-600 w-9">Loyal</span>
+                    <div class="flex-1 h-1.5 bg-gray-800 rounded overflow-hidden">
+                        <div class="h-1.5 ${loyaltyColor} rounded stat-bar" style="width:${m.stats.loyalty}%"></div>
+                    </div>
+                    <span class="text-[10px] ${loyaltyTextColor} w-5 text-right">${m.stats.loyalty}</span>
+                </div>
+            </div>
+
+            ${assignedRacket?`<p class="text-[10px] text-green-500 mb-2">⚔ Guarding: ${assignedRacket.name}</p>`:''}
+            ${m.role==='Vegas Boss'?`<p class="text-[10px] text-cyan-400 mb-2">🎰 Las Vegas</p>`:''}
+            ${m.role==='Miami Boss'?`<p class="text-[10px] text-pink-400 mb-2">🌴 Miami</p>`:''}
+            ${m.stats.loyalty<20&&!m.isBoss?`<p class="text-[10px] text-red-500 font-bold mb-2 animate-pulse">⚠ DISLOYALTY WARNING</p>`:''}
+
+            <div class="flex flex-wrap gap-1">${actions}</div>
+        `;
+        roster.appendChild(card);
+    });
+}
+
+function renderInfluenceGrid() {
+    const grid = $('#influence-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    GAME_CONFIG.influenceTargets.forEach(target => {
+        const current = gameState.influence[target.id]||0;
+        const pct = Math.min(100,(current/target.totalCost)*100);
+        const maxed = current>=target.totalCost;
+        const card = document.createElement('div');
+        card.className = `card rounded-xl p-5 border ${maxed?'border-amber-800 card-gold':'border-gray-800'}`;
+        card.innerHTML = `
+            <div class="flex justify-between items-start mb-2">
+                <h3 class="font-cinzel text-sm font-bold ${maxed?'text-amber-300':'text-white'} leading-tight">${target.name}</h3>
+                ${maxed?'<span class="text-[10px] bg-amber-950 text-amber-400 px-2 py-0.5 rounded font-bold shrink-0 ml-2">OWNED</span>':''}
+            </div>
+            <p class="text-[11px] text-gray-500 mb-3 leading-relaxed">${target.bonus}</p>
+            <div class="mb-1">
+                <div class="flex justify-between text-[10px] mb-1">
+                    <span class="text-gray-600">Influence</span>
+                    <span class="text-amber-600">$${current.toLocaleString()} / $${target.totalCost.toLocaleString()}</span>
+                </div>
+                <div class="h-2 bg-gray-800 rounded overflow-hidden">
+                    <div class="h-2 rounded stat-bar transition-all" style="width:${pct}%;background:linear-gradient(to right,#8a6d2f,#d4b96a)"></div>
+                </div>
+            </div>
+            ${!maxed
+                ? `<button class="btn btn-primary w-full mt-3 py-2 text-xs" onclick="buyInfluence('${target.id}')" ${gameState.cleanMoney<GAME_CONFIG.INFLUENCE_INVESTMENT?'disabled':''}>Invest $${GAME_CONFIG.INFLUENCE_INVESTMENT/1000}k Clean</button>`
+                : `<p class="text-xs text-amber-600 text-center mt-3 font-bold">✓ Bonus Active</p>`
+            }
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function renderBusinessFronts() {
+    const grid = $('#business-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    GAME_CONFIG.businessFronts.forEach(biz => {
+        const owned = gameState.ownedBusinesses.includes(biz.id);
+        const card = document.createElement('div');
+        card.className = `card rounded-xl p-4 border ${owned?'border-green-900':'border-gray-800'}`;
+        card.innerHTML = `
+            <div class="flex justify-between items-start mb-2">
+                <h3 class="font-bold text-sm ${owned?'text-green-300':'text-white'}">${biz.name}</h3>
+                ${owned?'<span class="text-[10px] bg-green-950 text-green-400 px-2 py-0.5 rounded font-bold">OWNED</span>':''}
+            </div>
+            <div class="space-y-0.5 text-[11px] mb-3">
+                <div class="flex justify-between"><span class="text-gray-600">Income</span><span class="text-green-400">+$${biz.income.toLocaleString()}/yr</span></div>
+                <div class="flex justify-between"><span class="text-gray-600">Launder Cap</span><span class="text-blue-400">$${biz.launderCap.toLocaleString()}/yr</span></div>
+                ${!owned?`<div class="flex justify-between"><span class="text-gray-600">Cost</span><span class="text-red-400 font-bold">$${biz.cost.toLocaleString()} Clean</span></div>`:''}
+            </div>
+            ${!owned?`<button class="btn btn-primary w-full py-2 text-xs font-bold" onclick="buyBusiness('${biz.id}')" ${gameState.cleanMoney<biz.cost?'disabled':''}>Purchase</button>`:
+            `<p class="text-[10px] text-green-600 text-center">✓ Generating income</p>`}
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function renderOpportunities() {
+    const grid = $('#opportunities-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    if (gameState.currentOpportunities.length===0) {
+        grid.innerHTML = '<p class="text-gray-600 italic col-span-3 text-center py-10 text-sm">No active opportunities. Advance the year to refresh.</p>';
+        return;
+    }
+    gameState.currentOpportunities.forEach(op => {
+        const canAfford = gameState.dirtyMoney>=op.cost;
+        const card = document.createElement('div');
+        card.className = 'card rounded-xl p-5 border border-gray-800';
+        const rewardText = op.reward.cash?`$${op.reward.cash.toLocaleString()} Dirty`:op.reward.influence?`$${op.reward.influence.toLocaleString()} Influence`:op.reward.favors?`+${op.reward.favors} Favor(s)`:'';
+        card.innerHTML = `
+            <h3 class="font-cinzel text-amber-300 text-sm font-bold mb-1">${op.name}</h3>
+            <p class="text-[11px] text-gray-500 mb-3 leading-relaxed">${op.description}</p>
+            <div class="space-y-1 text-[11px] mb-4 border-t border-gray-800 pt-3">
+                <div class="flex justify-between"><span class="text-gray-600">Cost</span><span class="text-red-400">$${op.cost.toLocaleString()}</span></div>
+                <div class="flex justify-between"><span class="text-gray-600">Failure Risk</span><span class="${op.risk>30?'text-red-400':'text-amber-400'}">${op.risk}%</span></div>
+                <div class="flex justify-between"><span class="text-gray-600">Heat</span><span class="text-orange-400">+${op.heat}</span></div>
+                <div class="flex justify-between"><span class="text-gray-600">Requires</span><span class="text-blue-400">${op.requirements.stat} ${op.requirements.total}</span></div>
+                <div class="flex justify-between"><span class="text-gray-600">Reward</span><span class="text-green-400">${rewardText}</span></div>
+            </div>
+            <button class="btn btn-danger w-full py-2 text-xs font-bold" onclick="openAssembleCrewModal('${op.id}')" ${!canAfford?'disabled':''}>
+                ${!canAfford?'Insufficient Funds':'Plan Operation'}
+            </button>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function renderLegacySection() {
+    const grid = $('#legacy-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    // Generation card
+    const genCard = document.createElement('div');
+    genCard.className = 'card rounded-xl p-4 border border-amber-900 card-gold';
+    genCard.innerHTML = `
+        <p class="text-[10px] font-cinzel text-amber-700 uppercase tracking-widest mb-1">Dynasty</p>
+        <p class="text-3xl font-cinzel font-black text-amber-300">${toRomanNumeral(gameState.generation)}</p>
+        <p class="text-[10px] text-gray-600 mt-1">Generation ${gameState.generation}</p>
+        <p class="text-[10px] text-gray-700 mt-1">Successions unlock legacy perks.</p>
+    `;
+    grid.appendChild(genCard);
+
+    GAME_CONFIG.legacyPerks.forEach(perk => {
+        const unlocked = gameState.unlockedLegacyPerks.includes(perk.id);
+        const locked = gameState.generation < perk.generation;
+        const card = document.createElement('div');
+        card.className = `card rounded-xl p-4 border ${unlocked?'border-amber-800':'border-gray-800'} ${locked?'opacity-40':''}`;
+        card.innerHTML = `
+            <div class="flex justify-between items-start mb-2">
+                <h3 class="font-cinzel text-xs font-bold ${unlocked?'text-amber-300':'text-gray-500'}">${perk.name}</h3>
+                ${unlocked?'<span class="text-[9px] bg-amber-950 text-amber-500 px-1.5 py-0.5 rounded">ACTIVE</span>':
+                  `<span class="text-[9px] text-gray-700">Gen ${perk.generation}</span>`}
+            </div>
+            <p class="text-[11px] text-gray-600">${perk.description}</p>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// =====================================================================
+//  MAIN RENDER
+// =====================================================================
+function render() {
+    $('#year-display').textContent = gameState.year;
+    $('#era-display').textContent = gameState.era;
+    $('#gen-display').textContent = toRomanNumeral(gameState.generation);
+    $('#family-size-display').textContent = gameState.members.filter(m=>m.age>=18&&m.unavailableUntil<=gameState.year).length;
+
+    $('#dirty-display').textContent = `$${Math.round(gameState.dirtyMoney).toLocaleString()}`;
+    $('#clean-display').textContent = `$${Math.round(gameState.cleanMoney).toLocaleString()}`;
+    $('#favors-display').textContent = gameState.favors;
+
+    const inc = calculateIncome('player');
+    $('#income-display').innerHTML = `<span class="text-red-400">+$${inc.dirty.toLocaleString()}</span> / <span class="text-green-400">+$${inc.clean.toLocaleString()}</span>`;
+
+    $('#heat-display').textContent = Math.round(gameState.heat);
+    const cf = Math.round(gameState.caseFile);
+    const cfEl = $('#case-file-display');
+    cfEl.textContent = `${cf}%`;
+    cfEl.className = cf<33?'text-lg font-bold rico-low':cf<66?'text-lg font-bold rico-med':'text-lg font-bold rico-high';
+
+    // Update button labels & states
+    let bribeCost = GAME_CONFIG.BRIBE_BASE_COST;
+    if (hasInstalledModule('smuggling_perk')) bribeCost = Math.round(bribeCost*0.75);
+    const policeMaxed = gameState.influence.police >= (GAME_CONFIG.influenceTargets.find(t=>t.id==='police').totalCost);
+    if (policeMaxed) bribeCost = Math.round(bribeCost*0.5);
+
+    let recruitCost = GAME_CONFIG.RECRUIT_COST;
+    if (hasInstalledModule('loanshark_perk')) recruitCost = Math.round(recruitCost*0.75);
+
+    $('#bribe-btn').textContent = `Bribe Police ($${(bribeCost/1000).toFixed(1)}k Clean)`;
+    $('#bribe-btn').disabled = gameState.cleanMoney < bribeCost;
+    $('#recruit-btn').textContent = `Recruit ($${(recruitCost/1000).toFixed(1)}k)`;
+    $('#recruit-btn').disabled = gameState.dirtyMoney < recruitCost;
+    $('#favor-btn').disabled = gameState.favors < 1;
+
+    if (gameState.year>=1960||gameState.cleanMoney>=500000) $('#national-btn').classList.remove('hidden');
+    else $('#national-btn').classList.add('hidden');
+    if (gameState.year>=1970) $('#offshore-btn').classList.remove('hidden');
+    else $('#offshore-btn').classList.add('hidden');
+
+    renderFamilyRoster();
+    renderInfluenceGrid();
+    renderBusinessFronts();
+    renderOpportunities();
+    renderLegacySection();
+
+    saveGame();
+}
+
+// =====================================================================
+//  MEMBER CREATION & MANAGEMENT
+// =====================================================================
+function createMember(isBoss=false, isSpecialist=false, father=null) {
+    const lastName = father ? father.name.split(' ').pop() : GAME_CONFIG.lastNames[getRandomInt(0,GAME_CONFIG.lastNames.length-1)];
+    const firstName = GAME_CONFIG.firstNames[getRandomInt(0,GAME_CONFIG.firstNames.length-1)];
+    const name = isBoss ? `Don ${firstName} ${lastName}` : `${firstName} ${lastName}`;
+    const traitKeys = Object.keys(GAME_CONFIG.traits).filter(t=>t!=='Leader'&&t!=='Legend');
+    const trait = traitKeys[getRandomInt(0,traitKeys.length-1)];
+
+    let m = {
+        id: Date.now()+Math.random(),
+        name, age: isBoss?45:(father?0:getRandomInt(18,30)),
+        isBoss, isMadeMan: isSpecialist||isBoss, isInformant:false, yearsInFamily:0,
+        upkeep: isBoss?0:GAME_CONFIG.UPKEEP_COST_PER_MEMBER,
+        role: isBoss?'Don':(father?'Youth':'Idle'),
+        assignedRacketId:null, unavailableUntil: father?gameState.year+18:0,
+        stats:{ brawn:getRandomInt(30,70), brains:getRandomInt(30,70), guts:getRandomInt(30,70), loyalty:getRandomInt(60,95) },
+        trait: isBoss?'Leader':trait,
+        fatherId: father?father.id:null, isHeir:false, greasedCount:0
+    };
+
+    if (father&&gameState.unlockedLegacyPerks.includes('blood_of_the_don'))
+        Object.keys(m.stats).forEach(s=>m.stats[s]+=5);
+    if (m.trait==='Brute') { m.stats.brawn=Math.min(100,m.stats.brawn+30); m.stats.brains=Math.max(10,m.stats.brains-20); }
+    else if (m.trait==='Loyal') m.stats.loyalty=Math.min(100,m.stats.loyalty+25);
+    else if (m.trait==='Deceitful') m.stats.loyalty=Math.max(10,m.stats.loyalty-25);
+    return m;
+}
+
+function makeMan(id) {
+    const m = gameState.members.find(x=>x.id===id);
+    if (m&&!m.isMadeMan&&m.yearsInFamily>=GAME_CONFIG.MADE_MAN_YEARS_REQ) {
+        m.isMadeMan=true; m.upkeep=GAME_CONFIG.MADE_MAN_UPKEEP_COST;
+        Object.keys(m.stats).forEach(s=>m.stats[s]=Math.min(100,m.stats[s]+10));
+        showToast(`${m.name} has been made. Omertà sworn.`,'success');
+        render();
+    }
+}
+
+function promoteToCapo(id) {
+    const m = gameState.members.find(x=>x.id===id);
+    if (m&&m.isMadeMan&&m.role!=='Capo') {
+        m.role='Capo'; m.upkeep=GAME_CONFIG.CAPO_UPKEEP_COST;
+        showToast(`${m.name} promoted to Capo.`,'success');
+        render();
+    }
+}
+
+function promoteToUnderboss(id) {
+    const m = gameState.members.find(x=>x.id===id);
+    if (!m||m.role!=='Capo') return;
+    const cur = gameState.members.find(x=>x.role==='Underboss');
+    if (cur) { cur.role='Capo'; cur.upkeep=GAME_CONFIG.CAPO_UPKEEP_COST; }
+    m.role='Underboss'; unassignMember(m.id,false);
+    gameState.members.forEach(x=>{ if(x.role==='Capo'&&x.id!==m.id) x.stats.loyalty=Math.max(0,x.stats.loyalty-20); });
+    showToast(`${m.name} is the new Underboss. Capos grumble.`,'success');
+    render();
+}
+
+function promoteToConsigliere(id) {
+    const m = gameState.members.find(x=>x.id===id);
+    if (!m||!m.isMadeMan) return;
+    const cur = gameState.members.find(x=>x.role==='Consigliere');
+    if (cur) { cur.role='Capo'; cur.upkeep=GAME_CONFIG.CAPO_UPKEEP_COST; }
+    m.role='Consigliere'; m.upkeep=GAME_CONFIG.CONSIGLIERE_UPKEEP_COST;
+    unassignMember(m.id,false);
+    gameState.members.forEach(x=>{ if(x.role==='Capo'&&x.id!==m.id) x.stats.loyalty=Math.max(0,x.stats.loyalty-15); });
+    showToast(`${m.name} named Consigliere.`,'success');
+    render();
+}
+
+function designateHeir(id) {
+    gameState.members.forEach(m=>m.isHeir=false);
+    const m=gameState.members.find(x=>x.id===id);
+    if(m){ m.isHeir=true; showToast(`${m.name} is the heir apparent.`); }
+    render();
+}
+
+function unassignMember(id, log=true) {
+    const m=gameState.members.find(x=>x.id===id);
+    if(m&&m.assignedRacketId){
+        const r=gameState.rackets.find(x=>x.id===m.assignedRacketId);
+        if(r) r.assignedMembers=r.assignedMembers.filter(mid=>mid!==id);
+        m.assignedRacketId=null;
+        if(m.role==='Working') m.role='Idle';
+        if(log) showToast(`${m.name} is now available.`);
+    }
+}
+
+function handleSuccession(oldName) {
+    const heir = gameState.members.find(m=>m.isHeir);
+    let newDon = heir || gameState.members.find(m=>m.role==='Underboss');
+    if (!newDon) {
+        const adults = gameState.members.filter(m=>m.age>=18&&m.role!=='Vegas Boss'&&m.role!=='Miami Boss'&&m.unavailableUntil<=gameState.year);
+        if (adults.length>0) { adults.sort((a,b)=>b.stats.guts-a.stats.guts); newDon=adults[0]; }
+    }
+    if (newDon) {
+        newDon.isBoss=true; newDon.role='Don'; newDon.isHeir=false;
+        newDon.name=`Don ${newDon.name.replace(/^Don /,'')}`;
+        gameState.generation++;
+        gameState.lastYearEvents.push({type:'succession',data:{oldDon:oldName,newDon:newDon.name}});
+        unlockLegacyPerks();
+        showToast(`${oldName} has passed. Long live ${newDon.name}!`,'danger');
+    } else {
+        showToast("The family line has ended. The streets claimed everything.",'danger');
+        setTimeout(()=>{
+            showEventModal({
+                title:"GAME OVER",
+                description:"With no heir and no leadership, the family crumbled into the dust of history. The streets have claimed everything your dynasty built.",
+                choices:[{text:"Start a New Saga",effect:()=>location.reload()}]
+            });
+        }, 1000);
+    }
+}
+
+function unlockLegacyPerks() {
+    GAME_CONFIG.legacyPerks.forEach(perk=>{
+        if(gameState.generation>=perk.generation&&!gameState.unlockedLegacyPerks.includes(perk.id)){
+            gameState.unlockedLegacyPerks.push(perk.id);
+            showToast(`Legacy Unlocked: ${perk.name}!`,'success');
+        }
+    });
+}
+
+// =====================================================================
+//  RIVALS
+// =====================================================================
+function initializeRivals() {
+    gameState.rivals = GAME_CONFIG.rivalFamilies.map(r=>{
+        const fn = r.name.split(' ')[0];
+        const members = [
+            {id:Math.random(),name:`Don ${GAME_CONFIG.firstNames[getRandomInt(0,GAME_CONFIG.firstNames.length-1)]} ${fn}`,role:'Don',stats:{brawn:getRandomInt(60,90),brains:getRandomInt(60,90),guts:getRandomInt(60,90)}},
+            {id:Math.random(),name:`${GAME_CONFIG.firstNames[getRandomInt(0,GAME_CONFIG.firstNames.length-1)]} ${fn}`,role:'Underboss',stats:{brawn:getRandomInt(50,80),brains:getRandomInt(50,80),guts:getRandomInt(50,80)}},
+            {id:Math.random(),name:`${GAME_CONFIG.firstNames[getRandomInt(0,GAME_CONFIG.firstNames.length-1)]} ${fn}`,role:'Capo',stats:{brawn:getRandomInt(40,70),brains:getRandomInt(40,70),guts:getRandomInt(40,70)}},
+            {id:Math.random(),name:`${GAME_CONFIG.firstNames[getRandomInt(0,GAME_CONFIG.firstNames.length-1)]} ${fn}`,role:'Capo',stats:{brawn:getRandomInt(40,70),brains:getRandomInt(40,70),guts:getRandomInt(40,70)}}
+        ];
+        return {...r,treasury:20000,strength:50,relationship:'Neutral',standing:50,members,successionCrisis:0};
+    });
+}
+
+function initializeRackets() {
+    gameState.rackets = GAME_CONFIG.availableRackets
+        .filter(r=>!r.unlockYear||r.unlockYear<=gameState.year)
+        .map(r=>{
+            const rival = GAME_CONFIG.rivalFamilies[getRandomInt(0,GAME_CONFIG.rivalFamilies.length-1)];
+            return {...r,owner:Math.random()>0.4?rival.name:null,assignedMembers:[],shutdown:0,intelRevealedUntil:0,modules:[]};
+        });
+}
+
+function updateRelationship(rival) {
+    if(rival.standing>75) rival.relationship='Friendly';
+    else if(rival.standing>30) rival.relationship='Neutral';
+    else rival.relationship='Hostile';
+}
+
+function runRivalFamilyTurns() {
+    gameState.rivals.forEach(rival=>{
+        if(rival.successionCrisis>gameState.year) return;
+
+        // Rivals claim unclaimed rackets
+        if(Math.random()<0.2){
+            const unclaimed=gameState.rackets.filter(r=>!r.owner);
+            if(unclaimed.length>0){ unclaimed[0].owner=rival.name; unclaimed[0].modules=[]; unclaimed[0].assignedMembers=[]; }
+        }
+
+        // Rival assassination attempts on the Don
+        if(rival.relationship==='War'&&Math.random()<0.05){
+            if(gameState.estate.walls){
+                showToast(`The ${rival.name} attempted a hit on the Estate. Security repelled them!`,'danger');
+            } else {
+                const don=gameState.members.find(m=>m.isBoss);
+                if(don&&Math.random()<0.3){
+                    gameState.members=gameState.members.filter(m=>m.id!==don.id);
+                    showToast(`TRAGEDY! The ${rival.name} assassinated ${don.name}!`,'danger');
+                    handleSuccession(don.name);
+                } else {
+                    showToast(`The ${rival.name} attempted to hit the Don. He narrowly escaped!`,'danger');
+                }
+            }
+        }
+
+        // Rival attacks on rackets
+        if(rival.relationship==='War'||(rival.relationship==='Hostile'&&Math.random()<0.1)){
+            const playerRackets=gameState.rackets.filter(r=>r.owner==='player');
+            if(playerRackets.length>0){
+                const target=playerRackets[getRandomInt(0,playerRackets.length-1)];
+                let atkPower = (rival.successionCrisis>gameState.year ? rival.strength*0.5 : rival.strength) + getRandomInt(0,100);
+                const defPower = getRacketDefense(target);
+                if(atkPower>defPower){
+                    const hasTunnel=target.modules&&target.modules.includes('tunnel');
+                    let dead=[];
+                    target.assignedMembers.forEach(mid=>{
+                        const m=gameState.members.find(x=>x.id===mid);
+                        if(m){m.assignedRacketId=null;if(m.role==='Working')m.role='Idle';}
+                        if(!hasTunnel&&Math.random()<0.4) dead.push(mid);
+                    });
+                    gameState.members=gameState.members.filter(m=>!dead.includes(m.id));
+                    target.owner=rival.name; target.modules=[]; target.assignedMembers=[];
+                    showToast(`The ${rival.name} raided your ${target.name}! Lost.${dead.length?` ${dead.length} guard(s) killed.`:''}${hasTunnel?' Guards used the Escape Tunnel.':''}`,'danger');
+                } else {
+                    showToast(`Your men repelled an attack by the ${rival.name}.`);
+                }
+            }
+        }
+    });
+}
+
+// =====================================================================
+//  MODAL: EVENT
+// =====================================================================
+function showEventModal(ev) {
+    const choices = ev.choices.map((c,i)=>
+        `<button class="btn btn-secondary w-full py-3 text-sm text-left px-4 hover:border-amber-700" onclick="handleEventChoice(${i})">${c.text}</button>`
+    ).join('');
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-50">
+            <div class="modal-panel max-w-lg w-full p-8 rounded-xl border-t-4 border-amber-700">
+                <h2 class="text-2xl font-cinzel text-amber-300 mb-1">${ev.title}</h2>
+                <div class="w-12 h-0.5 bg-amber-800 mb-4"></div>
+                <p class="text-gray-300 mb-6 leading-relaxed text-sm">${ev.description}</p>
+                <div class="space-y-3">${choices}</div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+    window._currentEventChoices = ev.choices;
+}
+
+function handleEventChoice(idx) {
+    if(window._currentEventChoices&&window._currentEventChoices[idx])
+        window._currentEventChoices[idx].effect();
+    closeModal();
+    render();
+}
+
+// =====================================================================
+//  RICO & HEAT
+// =====================================================================
+function triggerRicoTrial() {
+    if(gameState.caseFile>=GAME_CONFIG.RICO_TRIAL_THRESHOLD&&!gameState.ricoTrialTriggered){
+        gameState.ricoTrialTriggered=true;
+        gameState.lastYearEvents.push({type:'rico',data:{}});
+        showEventModal({
+            title:"⚖ FEDERAL RICO INDICTMENT",
+            description:"The FBI has built an airtight RICO case against your family. The Don faces certain imprisonment. What do you do?",
+            choices:[
+                { text:"Fight the charges in court ($100k Clean)",
+                  effect:()=>{
+                    if(gameState.cleanMoney>=100000){
+                        gameState.cleanMoney-=100000; gameState.caseFile=50; gameState.ricoTrialTriggered=false;
+                        showToast("Lawyers delayed the case. RICO file at 50%.","danger");
+                    } else {
+                        showToast("Can't afford lawyers. The Don is going to prison.","danger");
+                        jailTheDon();
+                    }
+                  }
+                },
+                { text:"Sacrifice a Made Man to the Feds",
+                  effect:()=>{
+                    const madeMan=gameState.members.find(m=>m.isMadeMan&&!m.isBoss);
+                    if(madeMan){
+                        gameState.members=gameState.members.filter(m=>m.id!==madeMan.id);
+                        gameState.caseFile=25; gameState.ricoTrialTriggered=false;
+                        showToast(`${madeMan.name} was handed over. Case weakened.`,"danger");
+                    }
+                  }
+                },
+                { text:"Take the fall (Don serves 5 years)",
+                  effect:()=>{ jailTheDon(); gameState.caseFile=0; gameState.ricoTrialTriggered=false; }
+                }
+            ]
+        });
+    }
+    // Reset trigger if caseFile drops below threshold
+    if(gameState.caseFile<GAME_CONFIG.RICO_TRIAL_THRESHOLD) gameState.ricoTrialTriggered=false;
+}
+
+function jailTheDon() {
+    const don=gameState.members.find(m=>m.isBoss);
+    if(don){
+        don.unavailableUntil=gameState.year+5; don.isBoss=false;
+        handleSuccession(`${don.name} (imprisoned)`);
+    }
+}
+
+function triggerHeatEvents() {
+    // Passive heat from rackets (unless police is maxed)
+    const policeMaxed=gameState.influence.police>=(GAME_CONFIG.influenceTargets.find(t=>t.id==='police').totalCost);
+    if(!policeMaxed){
+        const playerRackets=gameState.rackets.filter(r=>r.owner==='player').length;
+        gameState.heat+=playerRackets*GAME_CONFIG.HEAT_PER_RACKET;
+    }
+
+    // Arrests
+    if(gameState.heat>=80&&Math.random()<0.3){
+        const victims=gameState.members.filter(m=>!m.isBoss&&m.age>=18&&m.unavailableUntil<=gameState.year&&m.role!=='Vegas Boss'&&m.role!=='Miami Boss');
+        if(victims.length>0){
+            const arrested=victims[getRandomInt(0,victims.length-1)];
+            const sentence=getRandomInt(2,5);
+            arrested.unavailableUntil=gameState.year+sentence;
+            const oldRole=arrested.role;
+            arrested.role='Incarcerated';
+            if(arrested.assignedRacketId) unassignMember(arrested.id,false);
+            showToast(`BUST! ${arrested.name} was arrested. Out for ${sentence} years.`,'danger');
+        }
+    }
+
+    // Police shakedown
+    if(gameState.heat>=50&&Math.random()<0.2){
+        const protectedAmount=gameState.estate.safe?100000:0;
+        const exposed=Math.max(0,gameState.dirtyMoney-protectedAmount);
+        const shakedown=Math.min(exposed,getRandomInt(10000,30000));
+        if(shakedown>0){
+            gameState.dirtyMoney-=shakedown;
+            showToast(`Police shakedown! Lost $${shakedown.toLocaleString()} dirty cash.`,'danger');
+        }
+    }
+}
+
+// =====================================================================
+//  ACTIONS
+// =====================================================================
+function recruitMember() {
+    let cost=GAME_CONFIG.RECRUIT_COST;
+    if(hasInstalledModule('loanshark_perk')) cost=Math.round(cost*0.75);
+    if(gameState.dirtyMoney>=cost){
+        gameState.dirtyMoney-=cost;
+        const m=createMember(false);
+        gameState.members.push(m);
+        showToast(`${m.name} has joined the family.`,'success');
+        render();
+    }
+}
+
+function bribePolice() {
+    let cost=GAME_CONFIG.BRIBE_BASE_COST;
+    if(hasInstalledModule('smuggling_perk')) cost=Math.round(cost*0.75);
+    const policeMaxed=gameState.influence.police>=(GAME_CONFIG.influenceTargets.find(t=>t.id==='police').totalCost);
+    if(policeMaxed) cost=Math.round(cost*0.5);
+    if(gameState.cleanMoney>=cost){
+        gameState.cleanMoney-=cost;
+        const reduction=Math.min(gameState.heat,30);
+        gameState.heat=Math.max(0,gameState.heat-30);
+        showToast(`Paid off the police. Heat reduced by ${reduction}.`,'success');
+        render();
+    }
+}
+
+function buyBusiness(id) {
+    const biz=GAME_CONFIG.businessFronts.find(b=>b.id===id);
+    if(biz&&gameState.cleanMoney>=biz.cost&&!gameState.ownedBusinesses.includes(id)){
+        gameState.cleanMoney-=biz.cost;
+        gameState.ownedBusinesses.push(id);
+        showToast(`Purchased ${biz.name}.`,'success');
+        render();
+    }
+}
+
+function buyInfluence(targetId) {
+    const target=GAME_CONFIG.influenceTargets.find(t=>t.id===targetId);
+    let invest=GAME_CONFIG.INFLUENCE_INVESTMENT;
+    if(gameState.unlockedLegacyPerks.includes('political_animal')) invest=Math.round(invest*1.1);
+    if(gameState.cleanMoney>=GAME_CONFIG.INFLUENCE_INVESTMENT){
+        gameState.cleanMoney-=GAME_CONFIG.INFLUENCE_INVESTMENT;
+        gameState.influence[targetId]=Math.min(target.totalCost,gameState.influence[targetId]+invest);
+        showToast(`Invested in ${target.name}.`,'success');
+        render();
+    }
+}
+
+function generateNewOpportunities() {
+    const shuffled=[...GAME_CONFIG.specialOperations].sort(()=>0.5-Math.random());
+    gameState.currentOpportunities=shuffled.slice(0,3).map(op=>({...op,id:`op-${Math.random()}`}));
+}
+
+// =====================================================================
+//  STREET CRIME MODAL
+// =====================================================================
+function openStreetCrimeModal() {
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-50">
+            <div class="modal-panel max-w-md w-full p-8 rounded-xl border-t-4 border-red-700">
+                <h2 class="text-2xl font-cinzel text-red-400 mb-1">Street Crimes</h2>
+                <div class="w-10 h-0.5 bg-red-900 mb-4"></div>
+                <p class="text-gray-500 text-xs mb-6">Quick operations to fill the coffers. No year needed, but carry immediate risks and raise your heat.</p>
+                <div class="space-y-3">
+                    <button class="btn btn-secondary w-full py-3 text-sm text-left px-4 flex justify-between items-center" onclick="executeStreetCrime('shakedown')">
+                        <span class="font-bold">Shake Down Locals</span>
+                        <span class="text-xs text-red-400 shrink-0 ml-2">+$5k / +10 Heat</span>
+                    </button>
+                    <button class="btn btn-secondary w-full py-3 text-sm text-left px-4 flex justify-between items-center" onclick="executeStreetCrime('hijack')">
+                        <span class="font-bold">Hijack Supply Truck</span>
+                        <span class="text-xs text-red-400 shrink-0 ml-2">+$25k / +25 Heat / 20% Risk</span>
+                    </button>
+                    <button class="btn btn-secondary w-full py-3 text-sm text-left px-4 flex justify-between items-center" onclick="executeStreetCrime('gamble')" ${gameState.dirtyMoney<5000?'disabled':''}>
+                        <span class="font-bold">Underground High-Stakes Game</span>
+                        <span class="text-xs text-amber-500 shrink-0 ml-2">Bet $5k → 40% for +$30k</span>
+                    </button>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button class="btn btn-secondary py-2 px-6 text-sm" onclick="closeModal()">Back</button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+}
+
+function executeStreetCrime(type) {
+    if(type==='shakedown'){
+        gameState.dirtyMoney+=5000; gameState.heat+=10;
+        showToast("Shook down the neighborhood. +$5k Dirty.");
+    } else if(type==='hijack'){
+        gameState.heat+=25;
+        if(Math.random()<0.8){
+            gameState.dirtyMoney+=25000;
+            showToast("Hijacked a rival supply truck! +$25k Dirty.");
+        } else {
+            showToast("The hijack was a trap!","danger");
+            const avail=gameState.members.filter(m=>!m.isBoss&&m.age>=18);
+            if(avail.length>0){
+                const c=avail[getRandomInt(0,avail.length-1)];
+                gameState.members=gameState.members.filter(m=>m.id!==c.id);
+                showToast(`${c.name} was killed.`,"danger");
+            }
+        }
+    } else if(type==='gamble'){
+        if(gameState.dirtyMoney>=5000){
+            gameState.dirtyMoney-=5000;
+            if(Math.random()<0.4){ gameState.dirtyMoney+=30000; showToast("Jackpot! +$25k profit.","success"); }
+            else showToast("Lost $5k at the tables.");
+        }
+    }
+    if(gameState.era==='The RICO Era'&&gameState.heat>50) gameState.caseFile+=5;
+    render();
+    openStreetCrimeModal();
+}
+
+// =====================================================================
+//  LAUNDER MODAL
+// =====================================================================
+function openLaunderModal() {
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-50">
+            <div class="modal-panel max-w-md w-full p-8 rounded-xl border-t-4 border-green-700">
+                <h2 class="text-2xl font-cinzel text-green-400 mb-1">Street Laundering</h2>
+                <div class="w-10 h-0.5 bg-green-900 mb-4"></div>
+                <p class="text-gray-500 text-xs mb-4">Shady accountants will wash your cash at a steep 50% cut. Buy business fronts for automated laundering.</p>
+                <p class="text-red-400 font-bold mb-4">Available Dirty: $${Math.floor(gameState.dirtyMoney).toLocaleString()}</p>
+                <div class="space-y-3">
+                    <button class="btn btn-secondary w-full py-2 font-bold text-sm" onclick="manualLaunder(10000)" ${gameState.dirtyMoney<10000?'disabled':''}>Wash $10k → $5k Clean</button>
+                    <button class="btn btn-secondary w-full py-2 font-bold text-sm" onclick="manualLaunder(50000)" ${gameState.dirtyMoney<50000?'disabled':''}>Wash $50k → $25k Clean</button>
+                    <button class="btn btn-secondary w-full py-2 font-bold text-sm" onclick="manualLaunder(Math.floor(gameState.dirtyMoney/2)*2)" ${gameState.dirtyMoney<1000?'disabled':''}>Wash All ($${Math.floor(gameState.dirtyMoney).toLocaleString()} → $${Math.floor(gameState.dirtyMoney/2).toLocaleString()})</button>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button class="btn btn-secondary py-2 px-6 text-sm" onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+}
+
+function manualLaunder(amount) {
+    const actual=Math.min(amount,gameState.dirtyMoney);
+    if(actual>=1000){
+        gameState.dirtyMoney-=actual; gameState.cleanMoney+=Math.floor(actual/2);
+        showToast(`Washed $${actual.toLocaleString()} → $${Math.floor(actual/2).toLocaleString()} clean.`,'success');
+        closeModal();
+        render();
+    }
+}
+
+// =====================================================================
+//  FAVOR MODAL
+// =====================================================================
+function openFavorModal() {
+    if(gameState.favors<1) return;
+    const incarcerated=gameState.members.filter(m=>m.unavailableUntil>gameState.year);
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-[60]">
+            <div class="modal-panel max-w-md w-full p-8 rounded-xl border-t-4 border-amber-600">
+                <h2 class="text-2xl font-cinzel text-amber-200 mb-1">Call in a Favor</h2>
+                <div class="w-10 h-0.5 bg-amber-900 mb-4"></div>
+                <p class="text-gray-500 text-xs mb-6">You have ${gameState.favors} favor(s) banked with influential friends. Use them wisely.</p>
+                <div class="space-y-3">
+                    <button class="btn btn-primary w-full py-3 text-sm font-bold" onclick="useFavor('heat')">Erase All Heat <span class="opacity-70 text-xs">(The Commissioner)</span></button>
+                    <button class="btn btn-primary w-full py-3 text-sm font-bold" onclick="useFavor('case')">Wipe RICO Case File <span class="opacity-70 text-xs">(The D.A.)</span></button>
+                    <button class="btn btn-primary w-full py-3 text-sm font-bold" onclick="useFavor('prison')" ${incarcerated.length===0?'disabled':''}>Pardon a Made Man <span class="opacity-70 text-xs">(The Judge)</span></button>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button class="btn btn-secondary py-2 px-6 text-sm" onclick="closeModal()">Cancel</button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+}
+
+function useFavor(action) {
+    if(gameState.favors<1) return;
+    if(action==='heat'){ gameState.heat=0; gameState.favors--; showToast("All heat erased. You're clean.",'success'); }
+    else if(action==='case'){ gameState.caseFile=0; gameState.favors--; showToast("RICO files went missing. Back to zero.",'success'); }
+    else if(action==='prison'){
+        const list=gameState.members.filter(m=>m.unavailableUntil>gameState.year);
+        if(list.length>0){
+            list.sort((a,b)=>(b.stats.brawn+b.stats.brains)-(a.stats.brawn+a.stats.brains));
+            const p=list[0]; p.unavailableUntil=0; p.role='Idle'; gameState.favors--;
+            showToast(`${p.name} is a free man.`,'success');
+        }
+    }
+    closeModal(); render();
+}
+
+// =====================================================================
+//  MAP MODAL
+// =====================================================================
+function openMapModal(selectedRacketId=null) {
+    $('#modal-container').innerHTML = `
+        <div id="map-modal" class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-50">
+            <div id="map-modal-content" class="card relative w-full max-w-5xl rounded-xl border border-gray-700 overflow-hidden" style="height:70vh;">
+                <button class="absolute top-3 right-4 text-gray-400 hover:text-white text-2xl font-bold z-50 leading-none" onclick="closeModal()">×</button>
+                <div class="absolute top-3 left-4 z-40">
+                    <h2 class="font-cinzel text-amber-300 font-bold text-sm tracking-widest">NEW YORK CITY</h2>
+                    <p class="text-[10px] text-gray-500">${gameState.year} — Click a racket to manage it</p>
+                </div>
+                <div id="map-racket-container" class="relative w-full h-full"></div>
+                <div id="map-info-panel" class="p-5 overflow-y-auto"></div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+
+    const container = $('#map-racket-container');
+
+    // Neighborhood labels
+    const labels = [
+        {text:'LITTLE ITALY', x:'25%', y:'8%'},
+        {text:'THE DOCKS',     x:'18%', y:'63%'},
+        {text:'MIDTOWN',      x:'70%', y:'15%'}
+    ];
+    labels.forEach(l=>{
+        const div=document.createElement('div');
+        div.style.cssText=`position:absolute;left:${l.x};top:${l.y};transform:translateX(-50%);font-family:Cinzel,serif;font-size:10px;font-weight:bold;color:rgba(200,169,74,0.4);letter-spacing:0.15em;pointer-events:none;`;
+        div.textContent=l.text;
+        container.appendChild(div);
+    });
+
+    gameState.rackets.forEach(r=>{
+        const div=document.createElement('div');
+        let ownerClass='owner-uncontrolled';
+        if(r.owner==='player') ownerClass='owner-player';
+        else if(r.owner) {
+            const slug=r.owner.toLowerCase().replace(/ /g,'-');
+            ownerClass=`owner-${slug}`;
+        }
+        div.className=`racket-icon ${ownerClass} ${selectedRacketId==r.id?'active-icon':''}`;
+        div.style.left=r.mapCoordinates.x;
+        div.style.top=r.mapCoordinates.y;
+
+        // Custom color for non-standard rival factions
+        const standardRivals=['tattaglia family','barzini family','stracci family','cuneo family'];
+        if(r.owner&&r.owner!=='player'&&!standardRivals.includes(r.owner.toLowerCase()))
+            div.style.background='radial-gradient(circle, #f97316, #c2410c)';
+
+        div.title=r.name;
+        div.innerHTML=`<span style="color:rgba(255,255,255,0.9);font-size:9px;font-weight:900;text-shadow:0 1px 2px rgba(0,0,0,0.8);">${r.name.charAt(0)}</span>`;
+        div.onclick=()=>showRacketInfoPanel(r.id, div);
+        container.appendChild(div);
+    });
+
+    if(selectedRacketId){
+        const icons=container.querySelectorAll('.racket-icon');
+        const racket=gameState.rackets.find(r=>r.id===selectedRacketId);
+        if(racket){
+            icons.forEach(icon=>{
+                if(icon.style.left===racket.mapCoordinates.x&&icon.style.top===racket.mapCoordinates.y)
+                    showRacketInfoPanel(selectedRacketId,icon);
+            });
+        }
+    }
+}
+
+function showRacketInfoPanel(rid, icon) {
+    $$('.racket-icon').forEach(i=>i.classList.remove('active-icon'));
+    icon.classList.add('active-icon');
+    const r=gameState.rackets.find(rack=>rack.id===rid);
+    const panel=$('#map-info-panel');
+    if(!panel) return;
+    panel.classList.add('visible');
+
+    let html=`<h3 class="font-cinzel text-lg text-amber-200 font-bold mb-0.5">${r.name}</h3>`;
+    html+=`<p class="text-[10px] text-gray-600 mb-3 uppercase tracking-wider">${(GAME_CONFIG.neighborhoods.find(n=>n.id===r.neighborhoodId)||{}).name||''}</p>`;
+
+    if(r.owner==='player'){
+        const def=getRacketDefense(r);
+        let supplyBadge='';
+        if(r.supplyRequired===6){
+            const hasSmuggler=gameState.rackets.some(rack=>rack.id===6&&rack.owner==='player'&&rack.shutdown<gameState.year);
+            supplyBadge=hasSmuggler
+                ?`<span class="text-[10px] text-green-400 block mb-2">Supply Line: Active</span>`
+                :`<span class="text-[10px] text-red-500 block mb-2">Supply Line: Cut (–50% income)</span>`;
+        }
+        html+=`<span class="text-xs font-bold text-green-400 block mb-1">● CONTROLLED</span>`;
+        html+=supplyBadge;
+        html+=`<p class="text-[10px] text-gray-500 mb-3">Defense: ${def} | Guards: ${r.assignedMembers.length}</p>`;
+        html+=`<button class="btn btn-secondary w-full py-2 text-xs mb-2" onclick="openAssignCrewModal(${r.id})">Manage Guard Crew</button>`;
+
+        // Modules
+        html+=`<div class="border-t border-gray-800 mt-3 pt-3">`;
+        html+=`<p class="text-[10px] font-bold text-amber-600 uppercase tracking-wider mb-2">Modules (${r.modules.length}/3)</p>`;
+        r.modules.forEach(modId=>{
+            const mod=GAME_CONFIG.genericModules.find(m=>m.id===modId)||GAME_CONFIG.uniqueModules[r.id];
+            if(mod) html+=`<p class="text-[11px] text-green-400 mb-1">✓ ${mod.name}: <span class="text-gray-500">${mod.desc}</span></p>`;
+        });
+        if(r.modules.length===0) html+=`<p class="text-[10px] text-gray-600 italic mb-2">No modules installed.</p>`;
+        if(r.modules.length<3) html+=`<button class="btn btn-primary w-full py-1.5 text-xs mt-1" onclick="openModuleModal(${r.id})">+ Install Module</button>`;
+        html+=`</div>`;
+    } else if(!r.owner){
+        html+=`<p class="text-gray-500 text-xs italic mb-3">Unclaimed Turf</p>`;
+        html+=`<div class="text-[11px] text-gray-500 space-y-1 mb-4">
+            <div class="flex justify-between"><span>Cost</span><span class="text-red-400">$${r.cost.toLocaleString()} Dirty</span></div>
+            <div class="flex justify-between"><span>Base Income</span><span class="text-green-400">$${r.baseIncome.toLocaleString()}/yr</span></div>
+            <div class="flex justify-between"><span>Base Defense</span><span>${r.defense}</span></div>
+        </div>`;
+        html+=`<button class="btn btn-primary w-full py-2 text-xs font-bold" onclick="buyRacket(${r.id})" ${gameState.dirtyMoney<r.cost?'disabled':''}>Claim ($${(r.cost/1000).toFixed(0)}k Dirty)</button>`;
+    } else {
+        const rivalData=gameState.rivals.find(rv=>rv.name===r.owner);
+        html+=`<p class="text-red-400 text-xs font-bold mb-3">Controlled by ${r.owner}</p>`;
+        html+=`<div class="text-[11px] text-gray-500 space-y-1 mb-4">
+            <div class="flex justify-between"><span>Defense</span><span>${getRacketDefense(r)}</span></div>
+            ${rivalData&&rivalData.successionCrisis>gameState.year?`<div class="text-yellow-500 text-[10px] font-bold">SUCCESSION CRISIS — Defense halved!</div>`:''}
+        </div>`;
+        html+=`<button class="btn btn-danger w-full py-2 text-xs font-bold" onclick="openAttackModal(${r.id})">Raid Turf</button>`;
+    }
+    panel.innerHTML=html;
+}
+
+function buyRacket(id) {
+    const r=gameState.rackets.find(x=>x.id===id);
+    if(r&&!r.owner&&gameState.dirtyMoney>=r.cost){
+        gameState.dirtyMoney-=r.cost; r.owner='player';
+        showToast(`You claimed the ${r.name}.`,'success');
+        render(); openMapModal(id);
+    }
+}
+
+// =====================================================================
+//  MODULE MODAL
+// =====================================================================
+function openModuleModal(rid) {
+    const r=gameState.rackets.find(rack=>rack.id===rid);
+    if(!r) return;
+    let available=[...GAME_CONFIG.genericModules];
+    if(GAME_CONFIG.uniqueModules[r.id]) available.push(GAME_CONFIG.uniqueModules[r.id]);
+    available=available.filter(m=>!r.modules.includes(m.id));
+
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-[60]">
+            <div class="modal-panel max-w-md w-full p-8 rounded-xl border-t-4 border-amber-700">
+                <h2 class="text-xl font-cinzel text-amber-300 mb-4">Install Module: ${r.name}</h2>
+                <p class="text-gray-500 text-xs mb-4">${3-r.modules.length} slot(s) remaining.</p>
+                <div class="space-y-3 max-h-64 overflow-y-auto pr-1">
+                    ${available.map(mod=>`
+                        <div class="bg-gray-900 border border-gray-700 p-3 rounded-lg">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="font-bold text-white text-sm">${mod.name}</span>
+                                <span class="text-red-400 font-bold text-xs">$${(mod.cost/1000).toFixed(1)}k</span>
+                            </div>
+                            <p class="text-[11px] text-gray-500 mb-2">${mod.desc}</p>
+                            <button class="btn btn-primary w-full py-1.5 text-xs" onclick="buyModule(${r.id},'${mod.id}')" ${gameState.dirtyMoney<mod.cost?'disabled':''}>Install</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button class="btn btn-secondary py-2 px-5 text-sm" onclick="closeModal();openMapModal(${rid})">Cancel</button>
+                </div>
+            </div>
+        </div>`;
+}
+
+function buyModule(rid, modId) {
+    const r=gameState.rackets.find(rack=>rack.id===rid);
+    const mod=GAME_CONFIG.genericModules.find(m=>m.id===modId)||GAME_CONFIG.uniqueModules[rid];
+    if(r&&r.modules.length<3&&gameState.dirtyMoney>=mod.cost){
+        gameState.dirtyMoney-=mod.cost; r.modules.push(modId);
+        showToast(`Installed ${mod.name} at ${r.name}.`,'success');
+        render(); closeModal(); openMapModal(rid);
+    }
+}
+
+// =====================================================================
+//  ASSIGN CREW MODAL
+// =====================================================================
+function openAssignCrewModal(id) {
+    const racket=gameState.rackets.find(r=>r.id===id);
+    if(!racket) return;
+    const eligible=gameState.members.filter(m=>
+        !m.isBoss&&m.age>=18&&m.unavailableUntil<=gameState.year&&
+        m.role!=='Vegas Boss'&&m.role!=='Miami Boss'&&
+        (m.role==='Idle'||m.role==='Working'||m.assignedRacketId===id)
+    );
+    const armoryBonus=racket.modules&&racket.modules.includes('armory')?20:0;
+
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-[60]">
+            <div class="modal-panel max-w-xl w-full p-8 rounded-xl border-t-4 border-blue-700">
+                <h2 class="text-xl font-cinzel text-blue-400 mb-4">Guard Crew: ${racket.name}</h2>
+                <p class="text-gray-500 text-xs mb-4">Assigned crew defend this racket from raids and cannot join Special Operations.</p>
+                <div id="crew-assign-list" class="space-y-2 mb-6 max-h-52 overflow-y-auto pr-1">
+                    ${eligible.length===0?'<p class="text-gray-600 italic text-center py-4 text-sm">No available crew members.</p>':
+                    eligible.map(m=>`
+                        <label class="flex justify-between items-center p-2.5 ${m.assignedRacketId===id?'bg-blue-950 border border-blue-800':'bg-gray-900 border border-gray-800'} rounded-lg cursor-pointer hover:border-blue-600 transition-colors">
+                            <div>
+                                <span class="font-bold text-white text-sm">${m.name}</span>
+                                <span class="text-[10px] text-gray-600 block">Brawn: ${m.stats.brawn+armoryBonus}${armoryBonus>0?` <span class="text-amber-500">(+${armoryBonus} Armory)</span>`:''} | Role: ${m.role}</span>
+                            </div>
+                            <input type="checkbox" class="racket-crew-check w-4 h-4 accent-blue-500" data-id="${m.id}" ${m.assignedRacketId===id?'checked':''}>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button class="btn btn-secondary py-2 px-5 text-sm" onclick="closeModal();openMapModal(${id})">Cancel</button>
+                    <button id="save-crew-btn" class="btn btn-primary py-2 px-5 text-sm">Save</button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+
+    $('#save-crew-btn').onclick=()=>{
+        const selected=Array.from($$('.racket-crew-check:checked')).map(c=>parseFloat(c.dataset.id));
+        // Unassign old
+        racket.assignedMembers.forEach(mid=>{
+            const m=gameState.members.find(x=>x.id===mid);
+            if(m){m.assignedRacketId=null;if(m.role==='Working')m.role='Idle';}
+        });
+        racket.assignedMembers=[];
+        // Assign new
+        selected.forEach(mid=>{
+            const m=gameState.members.find(x=>x.id===mid);
+            if(m){
+                if(m.assignedRacketId&&m.assignedRacketId!==id){
+                    const old=gameState.rackets.find(r=>r.id===m.assignedRacketId);
+                    if(old) old.assignedMembers=old.assignedMembers.filter(x=>x!==mid);
+                }
+                m.assignedRacketId=id; if(m.role==='Idle') m.role='Working';
+                racket.assignedMembers.push(mid);
+            }
+        });
+        showToast(`Guard crew updated for ${racket.name}.`,'success');
+        closeModal(); openMapModal(id); render();
+    };
+}
+
+// =====================================================================
+//  ATTACK MODAL
+// =====================================================================
+function openAttackModal(rid) {
+    const r=gameState.rackets.find(rack=>rack.id===rid);
+    const warTax=gameState.activeLaw==='war_tax'?10000:0;
+    const eligible=gameState.members.filter(m=>
+        (m.role==='Idle'||m.role==='Working')&&m.age>=18&&
+        m.unavailableUntil<=gameState.year&&m.role!=='Vegas Boss'&&m.role!=='Miami Boss'
+    );
+
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 z-[60]">
+            <div class="modal-panel max-w-md w-full p-8 rounded-xl border-t-4 border-red-700">
+                <h3 class="text-xl font-cinzel text-red-400 mb-1">Raid: ${r.name}</h3>
+                <p class="text-[11px] text-gray-600 mb-4">Owner: ${r.owner} | Defense: ${getRacketDefense(r)}${warTax?`<br><span class="text-amber-500">War Tax: $10k Dirty (Commission Law)</span>`:''}</p>
+                <div class="space-y-2 mb-5 max-h-48 overflow-y-auto pr-1">
+                    ${eligible.length===0?'<p class="text-gray-600 italic text-sm text-center py-4">No available soldiers.</p>':
+                    eligible.map(m=>`
+                        <label class="flex justify-between items-center p-2 bg-gray-900 border border-gray-800 rounded cursor-pointer hover:border-red-700">
+                            <span class="text-sm">${m.name} <span class="text-[10px] text-gray-600">(Brawn: ${m.stats.brawn}${m.assignedRacketId?' · on guard duty':''})</span></span>
+                            <input type="checkbox" class="raid-check w-4 h-4 accent-red-500" data-id="${m.id}">
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="flex gap-3">
+                    <button class="btn btn-secondary flex-1 py-2 text-sm" onclick="closeModal();openMapModal(${rid})">Cancel</button>
+                    <button id="launch-raid-btn" class="btn btn-danger flex-1 py-2 text-sm font-bold" ${gameState.dirtyMoney<warTax?'disabled':''}>
+                        Attack${warTax?' (–$10k)':''}
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+
+    $('#launch-raid-btn').onclick=()=>{
+        const ids=Array.from($$('.raid-check:checked')).map(c=>parseFloat(c.dataset.id));
+        if(ids.length===0){showToast("Select at least one soldier.");return;}
+        if(gameState.dirtyMoney<warTax){showToast("Not enough Dirty Cash for War Tax.","danger");return;}
+        gameState.dirtyMoney-=warTax;
+
+        let playerBrawn=0;
+        ids.forEach(id=>{ const m=gameState.members.find(x=>x.id===id); if(m) playerBrawn+=m.stats.brawn; });
+
+        const rival=gameState.rivals.find(rv=>rv.name===r.owner);
+        if(rival){rival.standing=Math.max(0,rival.standing-30);updateRelationship(rival);}
+
+        gameState.heat+=25;
+
+        if(playerBrawn+getRandomInt(0,50)>r.defense+30){
+            r.owner='player'; r.assignedMembers=[]; r.modules=[];
+            showToast(`Victory! The ${r.name} is yours.`,'success');
+        } else {
+            showToast(`Raid failed. The ${r.owner||'defenders'} held firm.`,'danger');
+            if(Math.random()<0.5&&ids.length>0){
+                const deadId=ids[getRandomInt(0,ids.length-1)];
+                const dead=gameState.members.find(m=>m.id===deadId);
+                if(dead){
+                    gameState.members=gameState.members.filter(m=>m.id!==deadId);
+                    if(dead.assignedRacketId){ const old=gameState.rackets.find(r=>r.id===dead.assignedRacketId); if(old) old.assignedMembers=old.assignedMembers.filter(x=>x!==deadId); }
+                    showToast(`${dead.name} was killed in the raid.`,'danger');
+                }
+            }
+        }
+        closeModal(); render();
+    };
+}
+
+// =====================================================================
+//  ASSEMBLE CREW (SPECIAL OPS)
+// =====================================================================
+function openAssembleCrewModal(opId) {
+    const op=gameState.currentOpportunities.find(o=>o.id===opId);
+    if(!op) return;
+    const statKey=op.requirements.stat.toLowerCase();
+    const eligible=gameState.members.filter(m=>m.role==='Idle'&&m.age>=18&&m.unavailableUntil<=gameState.year);
+
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-50">
+            <div class="modal-panel max-w-xl w-full p-8 rounded-xl border-t-4 border-red-700">
+                <h2 class="text-xl font-cinzel text-red-400 mb-1">${op.name}</h2>
+                <p class="text-gray-500 text-xs mb-4">${op.description}</p>
+                <div id="crew-selection-list" class="space-y-2 mb-4 max-h-48 overflow-y-auto pr-1">
+                    ${eligible.length===0?'<p class="text-gray-600 italic text-sm text-center py-4">No idle crew members available.</p>':
+                    eligible.map(m=>`
+                        <label class="flex justify-between items-center p-2.5 bg-gray-900 border border-gray-800 rounded-lg cursor-pointer hover:border-red-700">
+                            <span class="text-sm">${m.name} <span class="text-[10px] text-gray-600">${op.requirements.stat}: ${m.stats[statKey]||0}</span></span>
+                            <input type="checkbox" class="crew-check w-4 h-4 accent-red-500" data-id="${m.id}" data-stat="${m.stats[statKey]||0}">
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="flex justify-between items-end border-t border-gray-800 pt-4">
+                    <div class="text-xs">
+                        <p class="text-gray-600">Required ${op.requirements.stat}: <span class="text-amber-400 font-bold">${op.requirements.total}</span></p>
+                        <p class="text-gray-600">Current Total: <span id="current-crew-total" class="text-white font-bold">0</span></p>
+                        <p class="text-gray-600 mt-1">Cost: <span class="text-red-400">$${op.cost.toLocaleString()} Dirty</span></p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="btn btn-secondary py-2 px-5 text-sm" onclick="closeModal()">Cancel</button>
+                        <button id="execute-op-btn" class="btn btn-danger py-2 px-5 text-sm font-bold" disabled>Execute</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+
+    const totalDisp=$('#current-crew-total');
+    const execBtn=$('#execute-op-btn');
+
+    $('#crew-selection-list').addEventListener('change',()=>{
+        let total=0;
+        $$('.crew-check:checked').forEach(c=>total+=parseInt(c.dataset.stat)||0);
+        totalDisp.textContent=total;
+        totalDisp.className=total>=op.requirements.total?'text-green-400 font-bold':'text-white font-bold';
+        execBtn.disabled=total<op.requirements.total||gameState.dirtyMoney<op.cost;
+    });
+
+    execBtn.onclick=()=>{
+        const selectedIds=Array.from($$('.crew-check:checked')).map(c=>parseFloat(c.dataset.id));
+        attemptOperation(op, selectedIds);
+    };
+}
+
+function attemptOperation(op, crewIds) {
+    gameState.dirtyMoney-=op.cost;
+    gameState.heat+=op.heat;
+    gameState.caseFile=Math.min(100,gameState.caseFile+op.caseFile);
+    const success=Math.random()*100>op.risk;
+    if(success){
+        if(op.reward.cash) gameState.dirtyMoney+=op.reward.cash;
+        if(op.reward.influence) gameState.influence[op.reward.target]+=op.reward.influence;
+        if(op.reward.favors) gameState.favors+=op.reward.favors;
+        showToast(`SUCCESS! ${op.name} completed.`,'success');
+    } else {
+        showToast(`FAILURE! ${op.name} went south.`,'danger');
+        if(crewIds.length>0){
+            const n=Math.ceil(crewIds.length*Math.random()*0.5);
+            for(let i=0;i<n;i++){
+                const tid=crewIds[getRandomInt(0,crewIds.length-1)];
+                const dead=gameState.members.find(m=>m.id===tid);
+                if(dead){
+                    gameState.members=gameState.members.filter(m=>m.id!==tid);
+                    if(dead.assignedRacketId){const old=gameState.rackets.find(r=>r.id===dead.assignedRacketId);if(old)old.assignedMembers=old.assignedMembers.filter(x=>x!==tid);}
+                    showToast(`${dead.name} didn't make it out.`,'danger');
+                }
+            }
+        }
+    }
+    gameState.currentOpportunities=gameState.currentOpportunities.filter(o=>o.id!==op.id);
+    closeModal(); render();
+}
+
+// =====================================================================
+//  RIVAL INTEL MODAL
+// =====================================================================
+function openRivalIntelModal() {
+    const content=gameState.rivals.map(rival=>{
+        const isCrisis=rival.successionCrisis>gameState.year;
+        return `
+        <div class="bg-gray-900 border ${rival.color} border rounded-xl p-4">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="font-cinzel text-base font-bold ${rival.textColor}">${rival.name}</h3>
+                <span class="text-[10px] text-gray-600">${rival.relationship} | Standing: ${rival.standing}</span>
+            </div>
+            ${isCrisis?`<p class="text-[10px] text-red-500 font-bold mb-2 animate-pulse">SUCCESSION CRISIS — ${rival.successionCrisis-gameState.year}yr remaining</p>`:''}
+            <div class="space-y-1.5">
+                ${rival.members.map(m=>`
+                    <div class="flex justify-between items-center bg-gray-800 rounded-lg p-2">
+                        <div>
+                            <p class="text-sm font-bold text-white">${m.name}</p>
+                            <p class="text-[10px] text-gray-600">${m.role} · B:${m.stats.brawn} Br:${m.stats.brains}</p>
+                        </div>
+                        <button class="btn btn-danger text-[10px] py-1 px-2 font-bold" onclick="openHitModal('${rival.name}',${m.id})" ${gameState.dirtyMoney<25000?'disabled':''}>Hit ($25k)</button>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+    }).join('');
+
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 z-50">
+            <div class="modal-panel max-w-4xl w-full p-8 rounded-xl border-t-4 border-red-800">
+                <h2 class="text-2xl font-cinzel text-red-400 mb-1">Rival Intelligence</h2>
+                <p class="text-gray-600 text-xs mb-5">Order hits to cripple rival operations. A successful hit on a Don triggers a Succession Crisis.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[55vh] overflow-y-auto pr-1">
+                    ${content}
+                </div>
+                <div class="flex justify-end mt-5">
+                    <button class="btn btn-secondary py-2 px-6 text-sm" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+}
+
+function openHitModal(rivalName, targetId) {
+    const rival=gameState.rivals.find(r=>r.name===rivalName);
+    const target=rival.members.find(m=>m.id===targetId);
+    const operatives=gameState.members.filter(m=>!m.isBoss&&m.age>=18&&m.unavailableUntil<=gameState.year&&(m.role==='Idle'||m.role==='Working')&&m.role!=='Vegas Boss'&&m.role!=='Miami Boss');
+
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 z-[60]">
+            <div class="modal-panel max-w-lg w-full p-8 rounded-xl border-t-4 border-red-800">
+                <h3 class="text-xl font-cinzel text-red-400 mb-4">Contract: ${target.name} (${target.role})</h3>
+                <div class="space-y-2 mb-5 max-h-52 overflow-y-auto pr-1">
+                    ${operatives.length===0?'<p class="text-gray-600 italic text-sm text-center py-4">No available operatives.</p>':
+                    operatives.map(m=>{
+                        const chance=Math.min(95,Math.max(10,m.stats.brawn+Math.floor(m.stats.guts/2)-target.stats.brawn-Math.floor(target.stats.brains/2)+50));
+                        return `
+                        <div class="flex justify-between items-center bg-gray-900 border border-gray-800 rounded-lg p-2.5">
+                            <div>
+                                <p class="text-sm font-bold text-white">${m.name}</p>
+                                <p class="text-[10px] text-gray-600">Brawn: ${m.stats.brawn} | Guts: ${m.stats.guts}</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-bold ${chance>60?'text-green-400':'text-red-400'}">${chance}%</span>
+                                <button class="btn btn-danger py-1 px-3 text-xs" onclick="executeHit('${rivalName}',${target.id},${m.id},${chance})">Send</button>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+                <div class="flex justify-end">
+                    <button class="btn btn-secondary py-2 px-5 text-sm" onclick="openRivalIntelModal()">Cancel</button>
+                </div>
+            </div>
+        </div>`;
+}
+
+function executeHit(rivalName, targetId, operativeId, chance) {
+    gameState.dirtyMoney-=25000;
+    const rival=gameState.rivals.find(r=>r.name===rivalName);
+    const target=rival.members.find(m=>m.id===targetId);
+    const operative=gameState.members.find(m=>m.id===operativeId);
+    rival.relationship='War'; rival.standing=0;
+
+    if(Math.random()*100<=chance){
+        rival.members=rival.members.filter(m=>m.id!==targetId);
+        gameState.heat+=15;
+        showToast(`SUCCESS! ${operative.name} took out ${target.name}.`,'success');
+        if(target.role==='Don'){
+            rival.successionCrisis=gameState.year+2;
+            showToast(`${rivalName} is in a Succession Crisis! Defense halved for 2 years.`,'danger');
+        } else {
+            rival.strength=Math.max(10,rival.strength-15);
+        }
+    } else {
+        gameState.heat+=30;
+        showToast(`FAILURE! The hit on ${target.name} went wrong.`,'danger');
+        if(Math.random()<0.5&&operative){
+            gameState.members=gameState.members.filter(m=>m.id!==operativeId);
+            showToast(`${operative.name} was killed during the botched hit.`,'danger');
+        } else {
+            showToast(`${operative.name} barely escaped. ${rivalName} is livid.`,'danger');
+        }
+    }
+    closeModal(); render();
+}
+
+// =====================================================================
+//  CIVIL WAR
+// =====================================================================
+function triggerCivilWar(traitor) {
+    gameState.members=gameState.members.filter(m=>m.id!==traitor.id);
+    const sympathizers=gameState.members.filter(m=>m.stats.loyalty<40&&!m.isBoss&&m.role!=='Vegas Boss'&&m.role!=='Miami Boss');
+    const defectors=sympathizers.filter(()=>Math.random()<0.6);
+    defectors.forEach(d=>gameState.members=gameState.members.filter(m=>m.id!==d.id));
+
+    const factionName=`${traitor.name.split(' ').pop()} Crew`;
+    traitor.role='Don'; traitor.name=`Don ${traitor.name.replace(/^Don /,'')}`;
+    const rivalMembers=[traitor,...defectors.map(d=>({...d,role:'Capo'}))];
+
+    const stolenRackets=[];
+    gameState.rackets.forEach(r=>{
+        if(r.assignedMembers.includes(traitor.id)||defectors.some(d=>r.assignedMembers.includes(d.id))){
+            r.owner=factionName; r.assignedMembers=[]; stolenRackets.push(r.name);
+        }
+    });
+
+    gameState.rivals.push({
+        name:factionName, color:"border-orange-600", textColor:"text-orange-400",
+        personality:'Vengeful', treasury:15000,
+        strength:50+traitor.stats.brawn, relationship:'War', standing:0,
+        members:rivalMembers, successionCrisis:0
+    });
+
+    gameState.lastYearEvents.unshift({type:'civil_war',data:{traitor:traitor.name,faction:factionName}});
+
+    setTimeout(()=>{
+        showEventModal({
+            title:"⚔ CIVIL WAR!",
+            description:`${traitor.name} has betrayed the family and formed the ${factionName}! ${defectors.length?`They took ${defectors.map(d=>d.name).join(', ')} with them. `:``}${stolenRackets.length?`They seized: ${stolenRackets.join(', ')}.`:''}`,
+            choices:[{text:"Death to all traitors.",effect:()=>{}}]
+        });
+    }, 800);
+}
+
+// =====================================================================
+//  COMMISSION MODAL
+// =====================================================================
+function openCommissionModal() {
+    const playerStr=gameState.members.reduce((s,m)=>s+m.stats.brawn,0);
+    const rivalStr=gameState.rivals.reduce((s,r)=>s+r.strength,0);
+    const law=gameState.activeLaw?GAME_CONFIG.laws.find(l=>l.id===gameState.activeLaw):null;
+
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-50">
+            <div class="modal-panel max-w-4xl w-full p-8 rounded-xl border-t-4 border-amber-700 overflow-hidden">
+                <h2 class="text-2xl font-cinzel text-amber-300 mb-1">The Commission</h2>
+                <div class="w-10 h-0.5 bg-amber-900 mb-4"></div>
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-3 mb-4 text-xs">
+                    <span class="font-bold text-gray-400 uppercase tracking-wider">Active Law: </span>
+                    ${law?`<span class="text-amber-400 font-bold">${law.name}</span> — <span class="text-gray-500">${law.desc}</span>`:'<span class="text-gray-600 italic">No active law.</span>'}
+                </div>
+                ${gameState.isBossOfBosses?
+                    `<div class="bg-amber-950 border border-amber-700 p-4 rounded-lg mb-5 text-center">
+                        <h3 class="font-cinzel text-xl text-amber-400 font-bold">CAPO DI TUTTI CAPI</h3>
+                        <p class="text-xs text-amber-200 mt-1">The Commission answers to you. (+$10k tax from each rival yearly)</p>
+                    </div>`:
+                    `<div class="bg-gray-900 border border-gray-800 rounded-lg p-4 mb-5 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-cinzel text-sm text-gray-300">Claim Boss of Bosses</h3>
+                            <p class="text-[10px] text-gray-600">Family Brawn (${playerStr}) must exceed all rivals (${rivalStr}) + $100k Clean</p>
+                        </div>
+                        <button class="btn btn-primary py-2 px-4 text-xs" onclick="claimBossOfBosses()" ${playerStr<=rivalStr||gameState.cleanMoney<100000?'disabled':''}>Claim</button>
+                    </div>`
+                }
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[40vh] overflow-y-auto pr-1">
+                    ${gameState.rivals.map(r=>`
+                        <div class="border ${r.color} bg-gray-900 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-1">
+                                <h3 class="font-cinzel text-sm font-bold ${r.textColor}">${r.name}</h3>
+                                <span class="text-[10px] text-gray-600">Str: ${r.strength}</span>
+                            </div>
+                            <p class="text-[11px] text-gray-600 mb-3">${r.relationship} · Standing: ${r.standing}</p>
+                            <div class="flex gap-2">
+                                <button class="btn btn-secondary text-xs py-1.5 px-3 flex-1" onclick="openSitDownModal('${r.name}')">Sit Down</button>
+                                <button class="btn btn-primary text-xs py-1.5 px-3 flex-1" onclick="handleDiplomacy('tribute','${r.name}')">Tribute ($20k)</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="flex justify-end mt-5">
+                    <button class="btn btn-secondary py-2 px-6 text-sm" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+}
+
+function openSitDownModal(rivalName) {
+    const rival=gameState.rivals.find(r=>r.name===rivalName);
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 z-[60]">
+            <div class="modal-panel max-w-md w-full p-8 rounded-xl border-t-4 border-amber-700">
+                <h3 class="text-xl font-cinzel text-amber-200 mb-4">Meeting with ${rivalName}</h3>
+                <p class="text-gray-400 text-sm mb-6 italic">"What is it you want to discuss, Corleone?"</p>
+                <div class="space-y-3">
+                    ${rival.relationship==='War'
+                        ?`<button class="btn btn-primary w-full py-3 text-sm font-bold" onclick="handleDiplomacy('peace','${rivalName}')">Offer Peace ($50k Clean)</button>`
+                        :`<button class="btn btn-danger w-full py-3 text-sm font-bold" onclick="handleDiplomacy('declare_war','${rivalName}')">Declare War</button>`
+                    }
+                    <button class="btn btn-secondary w-full py-3 text-sm" onclick="openCommissionModal()">Back</button>
+                </div>
+            </div>
+        </div>`;
+}
+
+function handleDiplomacy(action, rivalName) {
+    const rival=gameState.rivals.find(r=>r.name===rivalName);
+    if(action==='tribute'){
+        if(gameState.dirtyMoney>=20000){ gameState.dirtyMoney-=20000; rival.standing=Math.min(100,rival.standing+25); updateRelationship(rival); showToast(`Tribute sent to ${rivalName}.`,'success'); }
+        else showToast("Not enough Dirty Cash.","danger");
+    } else if(action==='peace'){
+        if(gameState.cleanMoney>=50000){ gameState.cleanMoney-=50000; rival.relationship='Neutral'; rival.standing=40; showToast(`Peace made with ${rivalName}.`,'success'); }
+        else showToast("Not enough Clean Cash.","danger");
+    } else if(action==='declare_war'){
+        const tax=gameState.activeLaw==='war_tax'?10000:0;
+        if(gameState.dirtyMoney>=tax){ gameState.dirtyMoney-=tax; rival.relationship='War'; rival.standing=0; showToast(`War declared on ${rivalName}!`,'danger'); }
+        else showToast("Not enough Dirty Cash for Commission War Tax.","danger");
+    }
+    closeModal(); render();
+}
+
+function claimBossOfBosses() {
+    const playerStr=gameState.members.reduce((s,m)=>s+m.stats.brawn,0);
+    const rivalStr=gameState.rivals.reduce((s,r)=>s+r.strength,0);
+    if(playerStr>rivalStr&&gameState.cleanMoney>=100000){
+        gameState.cleanMoney-=100000; gameState.isBossOfBosses=true;
+        showToast("You are now Capo di tutti i capi. The city is yours.",'success');
+        openCommissionModal(); render();
+    }
+}
+
+function triggerCommissionVote() {
+    const potentialLaws=[...GAME_CONFIG.laws].sort(()=>0.5-Math.random()).slice(0,2);
+    if(gameState.activeLaw) potentialLaws.push({id:'repeal',name:"Repeal Current Law",desc:"Remove the active law."});
+    const choices=potentialLaws.map(law=>({
+        text:`Vote: ${law.name}`,
+        effect:()=>{ gameState.activeLaw=(law.id==='repeal'?null:law.id); showToast(`Commission enacted: ${law.name}.`); render(); }
+    }));
+    showEventModal({ title:"THE COMMISSION CONVENES", description:"The Five Families gather to set a new underworld law. Your vote is decisive for the next 5 years.", choices });
+}
+
+// =====================================================================
+//  ESTATE MODAL
+// =====================================================================
+function openEstateModal() {
+    let inner='';
+    if(!gameState.estate.owned){
+        inner=`
+            <h2 class="text-2xl font-cinzel text-amber-300 mb-4">The Don's Estate</h2>
+            <p class="text-gray-500 text-sm mb-6">A sprawling compound outside the city. The ultimate symbol of power and legitimacy.</p>
+            <button class="btn btn-primary w-full py-3 font-bold text-sm flex justify-between px-4" onclick="buyEstate()" ${gameState.cleanMoney<250000?'disabled':''}>
+                <span>Purchase Estate</span><span class="text-xs opacity-70">$250k Clean</span>
+            </button>`;
+    } else {
+        const upgrades=[
+            {key:'walls',  name:'High Walls & Security', cost:100000, desc:'Protects the Don from rival assassination attempts.'},
+            {key:'safe',   name:'The Hidden Safe',        cost:50000,  desc:'Protects up to $100k Dirty Cash from shakedowns.'},
+        ];
+        inner=`
+            <h2 class="text-2xl font-cinzel text-amber-300 mb-4">The Estate</h2>
+            <div class="space-y-4">
+                ${upgrades.map(u=>`
+                    <div class="bg-gray-900 border ${gameState.estate[u.key]?'border-green-800':'border-gray-700'} rounded-lg p-3">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-bold text-sm ${gameState.estate[u.key]?'text-green-400':'text-white'}">${u.name}</span>
+                            <span class="text-[10px] ${gameState.estate[u.key]?'text-green-600':'text-amber-500'}">${gameState.estate[u.key]?'Owned':'$'+u.cost.toLocaleString()}</span>
+                        </div>
+                        <p class="text-[10px] text-gray-600 mb-2">${u.desc}</p>
+                        ${!gameState.estate[u.key]?`<button class="btn btn-primary w-full py-1.5 text-xs" onclick="buyEstateUpgrade('${u.key}')" ${gameState.cleanMoney<u.cost?'disabled':''}>Purchase</button>`:''}
+                    </div>
+                `).join('')}
+                <div class="bg-gray-900 border ${gameState.estate.parties?'border-amber-700':'border-gray-700'} rounded-lg p-3">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm">Lavish Parties</span>
+                        <span class="text-[10px] text-amber-500">$20k Clean/yr</span>
+                    </div>
+                    <p class="text-[10px] text-gray-600 mb-2">Keeps baseline crew loyalty above 40.</p>
+                    <button class="btn ${gameState.estate.parties?'btn-danger':'btn-primary'} w-full py-1.5 text-xs" onclick="toggleParties()">
+                        ${gameState.estate.parties?'Disable Parties':'Enable Parties'}
+                    </button>
+                </div>
+            </div>`;
+    }
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-50">
+            <div class="modal-panel max-w-lg w-full p-8 rounded-xl border-t-4 border-amber-700">
+                ${inner}
+                <div class="mt-6 flex justify-end">
+                    <button class="btn btn-secondary py-2 px-6 text-sm" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+}
+
+function buyEstate() {
+    if(gameState.cleanMoney>=250000){ gameState.cleanMoney-=250000; gameState.estate.owned=true; showToast("The Estate is yours. Welcome home.",'success'); openEstateModal(); render(); }
+}
+function buyEstateUpgrade(type) {
+    const costs={walls:100000,safe:50000};
+    if(gameState.cleanMoney>=costs[type]){ gameState.cleanMoney-=costs[type]; gameState.estate[type]=true; showToast(`Upgrade installed.`,'success'); openEstateModal(); render(); }
+}
+function toggleParties() { gameState.estate.parties=!gameState.estate.parties; openEstateModal(); }
+
+// =====================================================================
+//  OLD COUNTRY MODAL
+// =====================================================================
+function openOldCountryModal() {
+    const bonus=hasInstalledModule('narco_perk')?20:10;
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-50">
+            <div class="modal-panel max-w-md w-full p-8 rounded-xl border-t-4 border-amber-800">
+                <h2 class="text-2xl font-cinzel text-amber-300 mb-4">The Old Country</h2>
+                <div class="mb-5">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-gray-500 font-bold">Sicily Standing</span>
+                        <span class="text-amber-400 font-bold">${gameState.oldCountryStanding}/100</span>
+                    </div>
+                    <div class="h-2 bg-gray-800 rounded overflow-hidden">
+                        <div class="h-2 rounded stat-bar" style="width:${gameState.oldCountryStanding}%;background:linear-gradient(to right,#8a6d2f,#d4b96a)"></div>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <button class="btn btn-secondary w-full py-2.5 text-sm font-bold flex justify-between px-4" onclick="sendRemittance()" ${gameState.dirtyMoney<10000?'disabled':''}>
+                        <span>Send Remittance ($10k Dirty)</span><span class="text-green-400">+${bonus} Standing</span>
+                    </button>
+                    <button class="btn btn-primary w-full py-2.5 text-sm font-bold flex justify-between px-4" onclick="recruitImportedMuscle()" ${gameState.dirtyMoney<25000||gameState.oldCountryStanding<50?'disabled':''}>
+                        <span>Request Muscle ($25k Dirty)</span><span class="text-xs opacity-70">Req: 50 Standing</span>
+                    </button>
+                    <button class="btn btn-danger w-full py-2.5 text-sm font-bold flex justify-between px-4" onclick="fleeToSicily()" ${gameState.cleanMoney<100000||gameState.caseFile<80?'disabled':''}>
+                        <span>Flee to Sicily ($100k Clean)</span><span class="text-xs opacity-70">Req: 80% RICO</span>
+                    </button>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button class="btn btn-secondary py-2 px-6 text-sm" onclick="closeModal()">Back</button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+}
+
+function sendRemittance() {
+    if(gameState.dirtyMoney>=10000){
+        gameState.dirtyMoney-=10000;
+        const gain=hasInstalledModule('narco_perk')?20:10;
+        gameState.oldCountryStanding=Math.min(100,gameState.oldCountryStanding+gain);
+        showToast("Wire sent to Sicily. They acknowledge the respect.",'success');
+        openOldCountryModal(); render();
+    }
+}
+
+function recruitImportedMuscle() {
+    if(gameState.dirtyMoney>=25000&&gameState.oldCountryStanding>=50){
+        gameState.dirtyMoney-=25000;
+        const m=createMember(false,true);
+        m.name=`"${m.name.split(' ')[0]}" The Sicilian`;
+        m.stats.brawn=getRandomInt(85,100); m.stats.guts=getRandomInt(85,100); m.stats.loyalty=100;
+        m.trait='Legend';
+        gameState.members.push(m);
+        showToast(`A Sicilian legend has arrived to serve the family.`,'success');
+        openOldCountryModal(); render();
+    }
+}
+
+function fleeToSicily() {
+    if(gameState.cleanMoney>=100000&&gameState.caseFile>=80){
+        gameState.cleanMoney-=100000; closeModal();
+        showEventModal({
+            title:"ESCAPE TO SICILY — VICTORY!",
+            description:`With the RICO net closing, you wired $100k to your Sicilian contacts and boarded a midnight freighter. The feds got nothing. You live out your days as an untouchable exile in the land of your fathers — wealthy, respected, and free. The ${gameState.familyName} saga ends in legend.`,
+            choices:[{text:"Play Again",effect:()=>location.reload()}]
+        });
+    }
+}
+
+// =====================================================================
+//  OFFSHORE MODAL
+// =====================================================================
+function openOffshoreModal() {
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-85 flex items-center justify-center p-4 z-50">
+            <div class="modal-panel max-w-md w-full p-8 rounded-xl border-t-4 border-blue-700">
+                <h2 class="text-2xl font-cinzel text-blue-400 mb-1">Swiss Bank Account</h2>
+                <div class="w-10 h-0.5 bg-blue-900 mb-4"></div>
+                <p class="text-gray-500 text-xs mb-4">Protect clean cash from the IRS and FBI. Withdrawals take 1 year to process.</p>
+                <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 mb-4">
+                    <p class="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Offshore Balance</p>
+                    <p class="text-2xl font-bold text-green-400">$${gameState.offshore.toLocaleString()}</p>
+                    ${gameState.pendingWithdrawal>0?`<p class="text-xs text-amber-400 mt-2 animate-pulse font-bold">Pending: $${gameState.pendingWithdrawal.toLocaleString()} (arrives next year)</p>`:''}
+                </div>
+                <p class="text-sm font-bold text-gray-300 mb-3">Clean Cash: $${Math.floor(gameState.cleanMoney).toLocaleString()}</p>
+                <div class="space-y-2 mb-4">
+                    <div class="flex gap-2">
+                        <button class="btn btn-primary flex-1 py-2 text-xs" onclick="depositOffshore(50000)" ${gameState.cleanMoney<50000?'disabled':''}>Deposit $50k</button>
+                        <button class="btn btn-primary flex-1 py-2 text-xs" onclick="depositOffshore(100000)" ${gameState.cleanMoney<100000?'disabled':''}>Deposit $100k</button>
+                    </div>
+                    <button class="btn btn-secondary w-full py-2 text-xs" onclick="depositOffshore(gameState.cleanMoney)" ${gameState.cleanMoney<=0?'disabled':''}>Deposit All</button>
+                </div>
+                <div class="border-t border-gray-800 pt-4 space-y-2">
+                    <div class="flex gap-2">
+                        <button class="btn btn-secondary flex-1 py-2 text-xs border border-amber-800 text-amber-600" onclick="withdrawOffshore(50000)" ${gameState.offshore<50000?'disabled':''}>Withdraw $50k</button>
+                        <button class="btn btn-secondary flex-1 py-2 text-xs border border-amber-800 text-amber-600" onclick="withdrawOffshore(gameState.offshore)" ${gameState.offshore<=0?'disabled':''}>Withdraw All</button>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button class="btn btn-secondary py-2 px-6 text-sm" onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+}
+
+function depositOffshore(amount) {
+    const actual=Math.floor(Math.min(amount,gameState.cleanMoney));
+    if(actual>0){ gameState.cleanMoney-=actual; gameState.offshore+=actual; showToast(`Deposited $${actual.toLocaleString()} to Zurich.`,'success'); openOffshoreModal(); render(); }
+}
+function withdrawOffshore(amount) {
+    const actual=Math.floor(Math.min(amount,gameState.offshore));
+    if(actual>0){ gameState.offshore-=actual; gameState.pendingWithdrawal+=actual; showToast(`Withdrawal of $${actual.toLocaleString()} requested. Processing...`); openOffshoreModal(); render(); }
+}
+
+// =====================================================================
+//  NATIONAL MAP
+// =====================================================================
+function openNationalMapModal() {
+    const capos=gameState.members.filter(m=>!m.isBoss&&m.role==='Capo'&&m.unavailableUntil<=gameState.year);
+
+    const expeditionUI=(city,cityName,cost,costType,reward,rewardType)=>{
+        const bossId=gameState.expeditions[city];
+        if(bossId){
+            const boss=gameState.members.find(m=>m.id===bossId);
+            if(!boss) return `<div class="bg-gray-900 border border-gray-700 rounded-xl p-4"><h3 class="font-cinzel text-gray-500">${cityName}</h3><p class="text-xs text-gray-600 mt-2">The boss is gone.</p></div>`;
+            const rogue=boss.stats.loyalty<30;
+            return `
+            <div class="bg-gray-900 border ${rogue?'border-red-700':'border-green-700'} rounded-xl p-4">
+                <h3 class="font-cinzel text-base font-bold text-amber-300 mb-1">${cityName}</h3>
+                <p class="text-sm text-gray-400 mb-1">Boss: <span class="text-white font-bold">${boss.name}</span></p>
+                <p class="text-xs mb-1">Loyalty: <span class="${rogue?'text-red-500 font-bold animate-pulse':'text-amber-400 font-bold'}">${boss.stats.loyalty}</span></p>
+                <p class="text-xs ${rogue?'text-red-500 font-bold':'text-green-400'} mb-3">${rogue?'ROGUE — Withholding profits!':'Generating '+reward+'/yr'}</p>
+                <button class="btn btn-secondary w-full py-2 text-xs mb-2 font-bold" onclick="greaseExpedition('${boss.id}')" ${gameState.dirtyMoney<15000?'disabled':''}>Send Bribe ($15k) [+20 Loyalty]</button>
+                <button class="btn btn-danger w-full py-2 text-xs font-bold" onclick="recallExpedition('${city}')">Recall to Home City</button>
+            </div>`;
+        }
+        return `
+        <div class="bg-gray-900 border border-gray-700 rounded-xl p-4">
+            <h3 class="font-cinzel text-base font-bold text-gray-400 mb-1">${cityName}</h3>
+            <p class="text-xs text-gray-600 mb-1">Cost: <span class="${costType==='dirty'?'text-red-400':'text-green-400'} font-bold">${cost}</span></p>
+            <p class="text-xs text-gray-600 mb-3">Reward: <span class="${rewardType==='dirty'?'text-red-400':'text-green-400'} font-bold">${reward}/yr</span></p>
+            <select id="${city}-capo-select" class="w-full mb-3 text-xs py-2">
+                <option value="">Select a Capo...</option>
+                ${capos.map(c=>`<option value="${c.id}">${c.name} (Loyalty: ${c.stats.loyalty})</option>`).join('')}
+            </select>
+            <button class="btn ${costType==='dirty'?'btn-danger':'btn-primary'} w-full py-2 text-xs font-bold" onclick="establishExpedition('${city}')" ${(costType==='dirty'?gameState.dirtyMoney:gameState.cleanMoney)<parseInt(cost.replace(/[^0-9]/g,''))*1000?'disabled':''}>Establish Operation</button>
+        </div>`;
+    };
+
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 z-50">
+            <div class="modal-panel max-w-3xl w-full p-8 rounded-xl border-t-4 border-blue-700">
+                <h2 class="text-2xl font-cinzel text-blue-400 mb-1">National Map</h2>
+                <p class="text-gray-500 text-xs mb-5">Expand beyond New York. Out-of-town bosses generate big profits but lose loyalty over time.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                    ${expeditionUI('vegas','Las Vegas Casino','$250k','clean','$50k Clean','clean')}
+                    ${expeditionUI('miami','Miami Smuggling','$150k','dirty','$75k Dirty','dirty')}
+                </div>
+                <div class="flex justify-end">
+                    <button class="btn btn-secondary py-2 px-6 text-sm" onclick="closeModal()">Back</button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+}
+
+function establishExpedition(city) {
+    const sel=$(`#${city}-capo-select`);
+    if(!sel||!sel.value){showToast("Select a Capo first.");return;}
+    const capoId=parseFloat(sel.value);
+    const capo=gameState.members.find(m=>m.id===capoId);
+    if(!capo) return;
+    if(city==='vegas'&&gameState.cleanMoney>=250000){
+        gameState.cleanMoney-=250000; unassignMember(capoId,false); capo.role='Vegas Boss'; gameState.expeditions.vegas=capoId;
+        showToast(`${capo.name} dispatched to Las Vegas.`,'success');
+    } else if(city==='miami'&&gameState.dirtyMoney>=150000){
+        gameState.dirtyMoney-=150000; unassignMember(capoId,false); capo.role='Miami Boss'; gameState.expeditions.miami=capoId;
+        showToast(`${capo.name} dispatched to Miami.`,'success');
+    }
+    openNationalMapModal(); render();
+}
+
+function recallExpedition(city) {
+    const bossId=gameState.expeditions[city];
+    const boss=gameState.members.find(m=>m.id===bossId);
+    if(boss){ boss.role='Capo'; boss.stats.loyalty=Math.max(0,boss.stats.loyalty-30); showToast(`${boss.name} recalled. Furious about the demotion.`,'danger'); }
+    gameState.expeditions[city]=null; openNationalMapModal(); render();
+}
+
+function greaseExpedition(bossId) {
+    if(gameState.dirtyMoney>=15000){
+        gameState.dirtyMoney-=15000;
+        const boss=gameState.members.find(m=>m.id===parseFloat(bossId));
+        if(boss){ boss.stats.loyalty=Math.min(100,boss.stats.loyalty+20); showToast(`Care package sent to ${boss.name}.`,'success'); }
+        openNationalMapModal(); render();
+    }
+}
+
+// =====================================================================
+//  YEAR ADVANCEMENT
+// =====================================================================
+function advanceYear() {
+    if(!$('#modal-container').classList.contains('hidden')) return;
+    showNewspaper();
+}
+
+function showNewspaper() {
+    let headline='Quiet Streets in the Big Apple';
+    let subtitle='Police report crime at a seasonal low.';
+    const major=gameState.lastYearEvents[0];
+    if(major){
+        if(major.type==='succession'){ headline=`New Don: ${major.data.newDon} Takes Command`; subtitle=`City watches as leadership changes within the family.`; }
+        else if(major.type==='rico'){ headline=`RICO INDICTMENT ROCKS ORGANIZED CRIME`; subtitle=`Federal prosecutors unveil sweeping charges.`; }
+        else if(major.type==='civil_war'){ headline=`MOB WAR ERUPTS FROM WITHIN!`; subtitle=`Internal strife fractures the city's most powerful family.`; }
+    }
+
+    const inc=calculateIncome('player');
+    const upkeep=gameState.members.reduce((t,m)=>t+m.upkeep,0);
+    const net=inc.dirty+inc.clean-upkeep;
+
+    $('#modal-container').innerHTML = `
+        <div class="modal fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center p-4 z-50">
+            <div id="newspaper-modal-content" class="max-w-2xl w-full p-8 rounded shadow-2xl border-8 border-gray-800">
+                <div class="text-center border-b-4 border-gray-800 pb-3 mb-4">
+                    <h2 id="newspaper-masthead" class="text-3xl tracking-widest font-black uppercase">THE DAILY GAZETTE</h2>
+                    <p class="text-[10px] font-bold uppercase tracking-wider mt-1 border-t border-b border-gray-700 py-1">New York, ${gameState.year} · Final Edition · Price: Three Cents</p>
+                </div>
+                <h3 id="newspaper-headline" class="mb-2">${headline}</h3>
+                <p class="text-base italic text-gray-700 mb-4 border-b border-gray-300 pb-3">${subtitle}</p>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="space-y-1.5">
+                        <p class="font-bold text-gray-800 uppercase text-[10px] tracking-widest border-b border-gray-400 pb-1 mb-2">Year in Review</p>
+                        <p>Dirty Income: <strong>$${inc.dirty.toLocaleString()}</strong></p>
+                        <p>Clean Income: <strong>$${inc.clean.toLocaleString()}</strong></p>
+                        <p>Total Upkeep: <strong>-$${upkeep.toLocaleString()}</strong></p>
+                        <p class="${net>=0?'text-green-700':'text-red-700'} font-bold">Net Change: ${net>=0?'+':''}$${net.toLocaleString()}</p>
+                    </div>
+                    <div class="space-y-1.5">
+                        <p class="font-bold text-gray-800 uppercase text-[10px] tracking-widest border-b border-gray-400 pb-1 mb-2">Family Status</p>
+                        <p>Generation: <strong>${toRomanNumeral(gameState.generation)}</strong></p>
+                        <p>Active Members: <strong>${gameState.members.filter(m=>m.age>=18&&m.unavailableUntil<=gameState.year).length}</strong></p>
+                        <p>Rackets Held: <strong>${gameState.rackets.filter(r=>r.owner==='player').length}</strong></p>
+                        <p>Family Heat: <strong>${Math.round(gameState.heat)}</strong></p>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-8 border-2 border-gray-700 rounded" onclick="continueYear()">CONTINUE →</button>
+                </div>
+            </div>
+        </div>`;
+    $('#modal-container').classList.remove('hidden');
+}
+
+function continueYear() {
+    closeModal();
+    gameState.year++;
+    gameState.lastYearEvents=[];
+
+    // Process offshore withdrawal
+    if(gameState.pendingWithdrawal>0){
+        gameState.cleanMoney+=gameState.pendingWithdrawal;
+        showToast(`Swiss Bank wire cleared! +$${gameState.pendingWithdrawal.toLocaleString()} Clean.`,'success');
+        gameState.pendingWithdrawal=0;
+    }
+
+    generateNewOpportunities();
+
+    // Era transitions
+    let eraChanged=null;
+    if(gameState.year===1960){
+        gameState.era='The Narcotics Boom';
+        const nc=GAME_CONFIG.availableRackets.find(r=>r.id===7);
+        if(nc&&!gameState.rackets.some(r=>r.id===7)){
+            const rival=GAME_CONFIG.rivalFamilies[getRandomInt(0,GAME_CONFIG.rivalFamilies.length-1)];
+            gameState.rackets.push({...nc,owner:rival.name,assignedMembers:[],shutdown:0,intelRevealedUntil:0,modules:[]});
+        }
+        eraChanged={title:'The 1960s: The Narcotics Boom',description:'A new racket has appeared in Midtown: the Narcotics Trade. Enormous profits, but the product corrupts loyalty. The old rules are changing fast.'};
+    } else if(gameState.year===1970){
+        gameState.era='The RICO Era';
+        eraChanged={title:'The 1970s: The RICO Era',description:'Congress passed the Racketeer Influenced and Corrupt Organizations Act. The FBI now builds long-term cases. Your Case File grows faster each year. Invest in legitimate fronts and police influence to survive the decade. Swiss Bank accounts are now available.'};
+    }
+
+    // Estate party upkeep
+    if(gameState.estate.parties){
+        if(gameState.cleanMoney>=20000) gameState.cleanMoney-=20000;
+        else { gameState.estate.parties=false; showToast("Parties canceled — out of Clean Cash.","danger"); }
+    }
+
+    // Active law effects
+    if(gameState.activeLaw==='narcotics_ban'&&gameState.rackets.some(r=>r.id===7&&r.owner==='player')){
+        gameState.rivals.forEach(r=>r.standing=Math.max(0,r.standing-20));
+        showToast("The Commission sanctions you for the Narcotics Ban violation!","danger");
+    }
+    if(gameState.activeLaw==='mandatory_tribute') gameState.rivals.forEach(r=>r.standing=Math.min(100,r.standing+5));
+
+    // Boss of Bosses tax
+    if(gameState.isBossOfBosses){
+        const tribute=gameState.rivals.length*10000;
+        gameState.dirtyMoney+=tribute;
+        showToast(`Collected $${tribute.toLocaleString()} in Boss of Bosses tribute.`,'success');
+    }
+
+    // Collect income
+    const inc=calculateIncome('player');
+    const upkeep=gameState.members.reduce((t,m)=>t+m.upkeep,0);
+    gameState.dirtyMoney+=inc.dirty;
+    gameState.cleanMoney+=inc.clean;
+
+    // Pay upkeep
+    if(gameState.dirtyMoney>=upkeep){ gameState.dirtyMoney-=upkeep; }
+    else {
+        const remainder=upkeep-gameState.dirtyMoney;
+        gameState.dirtyMoney=0;
+        gameState.cleanMoney=Math.max(0,gameState.cleanMoney-remainder);
+    }
+
+    // Auto-launder via fronts
+    const toLaunder=Math.min(gameState.dirtyMoney,inc.launderCap);
+    if(toLaunder>0){
+        gameState.dirtyMoney-=toLaunder; gameState.cleanMoney+=toLaunder;
+        showToast(`Fronts laundered $${Math.round(toLaunder).toLocaleString()} into clean cash.`,'success');
+    }
+
+    // Age members, loyalty, youth coming of age, children
+    let civilWarTriggered=false;
+    gameState.members.forEach(m=>{
+        m.age++;
+        if(m.age===18&&m.role==='Youth'){ m.role='Idle'; showToast(`${m.name} has come of age and joined the crew.`,'success'); }
+        m.yearsInFamily++;
+        if(m.role!=='Idle'&&m.role!=='Youth'){
+            m.stats.brawn=Math.min(100,m.stats.brawn+getRandomInt(0,2));
+            m.stats.brains=Math.min(100,m.stats.brains+getRandomInt(0,2));
+        }
+        if(m.trait==='Ambitious'&&m.role==='Idle') m.stats.loyalty=Math.max(0,m.stats.loyalty-10);
+        if(m.trait==='Gambler'&&Math.random()<0.15){ const loss=getRandomInt(2000,10000); gameState.dirtyMoney=Math.max(0,gameState.dirtyMoney-loss); showToast(`${m.name}'s gambling cost us $${loss.toLocaleString()}.`,'danger'); }
+        if(m.assignedRacketId===7){ m.stats.loyalty=Math.max(0,m.stats.loyalty-getRandomInt(5,12)); }
+        if(gameState.estate.parties&&m.stats.loyalty<40&&m.role!=='Vegas Boss'&&m.role!=='Miami Boss') m.stats.loyalty=40;
+        if(m.role==='Vegas Boss'||m.role==='Miami Boss') m.stats.loyalty=Math.max(0,m.stats.loyalty-getRandomInt(5,15));
+        if(!civilWarTriggered&&!m.isBoss&&m.stats.loyalty<20&&(m.role==='Capo'||m.role==='Underboss'||m.role==='Consigliere')){
+            triggerCivilWar(m); civilWarTriggered=true;
+        }
+
+        // Children for boss
+        if(m.isBoss&&Math.random()<GAME_CONFIG.CHANCE_OF_CHILD){
+            const child=createMember(false,false,m);
+            gameState.members.push(child);
+            showToast(`A child has been born into the ${gameState.familyName} family.`,'success');
+        }
+    });
+
+    // Natural deaths
+    const died=[];
+    gameState.members=gameState.members.filter(m=>{
+        if(m.age<18) return true;
+        const deathChance=Math.pow(m.age/90,4);
+        if(Math.random()<deathChance){
+            died.push(m.name);
+            if(m.isBoss) handleSuccession(m.name);
+            if(gameState.expeditions.vegas===m.id) gameState.expeditions.vegas=null;
+            if(gameState.expeditions.miami===m.id) gameState.expeditions.miami=null;
+            const r=gameState.rackets.find(x=>x.id===m.assignedRacketId);
+            if(r) r.assignedMembers=r.assignedMembers.filter(x=>x!==m.id);
+            return false;
+        }
+        return true;
+    });
+    if(died.length>0) showToast(`${died.join(', ')} passed away.`,'danger');
+
+    // Rival family upkeep
+    gameState.rivals.forEach(rival=>{
+        if(!rival.members.some(m=>m.role==='Don')){
+            const heir=rival.members.find(m=>m.role==='Underboss')||rival.members.find(m=>m.role==='Capo');
+            const fn=rival.name.split(' ')[0];
+            if(heir){ heir.role='Don'; heir.name=`Don ${heir.name.replace(/^Don /,'')}`; }
+            else rival.members.push({id:Math.random(),name:`Don ${GAME_CONFIG.firstNames[getRandomInt(0,GAME_CONFIG.firstNames.length-1)]} ${fn}`,role:'Don',stats:{brawn:getRandomInt(60,90),brains:getRandomInt(60,90),guts:getRandomInt(60,90)}});
+        }
+        if(!rival.members.some(m=>m.role==='Underboss')&&rival.members.length>1){
+            const nb=rival.members.find(m=>m.role==='Capo'&&m.role!=='Don');
+            if(nb) nb.role='Underboss';
+        }
+        if(rival.members.length<3){
+            const fn=rival.name.split(' ')[0];
+            rival.members.push({id:Math.random(),name:`${GAME_CONFIG.firstNames[getRandomInt(0,GAME_CONFIG.firstNames.length-1)]} ${fn}`,role:'Capo',stats:{brawn:getRandomInt(40,70),brains:getRandomInt(40,70),guts:getRandomInt(40,70)}});
+        }
+    });
+
+    // Heat decay
+    let decay=GAME_CONFIG.HEAT_DECAY;
+    if(gameState.activeLaw==='mandatory_tribute') decay=Math.floor(decay*0.5);
+    gameState.heat=Math.max(0,gameState.heat-decay);
+
+    // RICO era case file growth
+    if(gameState.era==='The RICO Era'){
+        const playerRackets=gameState.rackets.filter(r=>r.owner==='player').length;
+        const mult=gameState.activeLaw==='omerta_pact'?0.5:1;
+        gameState.caseFile+=((gameState.heat/15)+(playerRackets*1.5))*mult;
+        if(Math.random()<0.2&&gameState.heat>25){ showToast("FBI Wiretap discovered! Case file spiked.","danger"); gameState.caseFile+=10; }
+    }
+    gameState.caseFile=Math.min(100,Math.max(0,gameState.caseFile));
+
+    // Events
+    triggerHeatEvents();
+    triggerRicoTrial();
+
+    const hasMajorEvent=gameState.lastYearEvents.length>0||eraChanged;
+    if(gameState.year>1946&&gameState.year%5===0&&!hasMajorEvent){
+        triggerCommissionVote();
+    } else if(!hasMajorEvent&&Math.random()<GAME_CONFIG.EVENT_CHANCE_PER_YEAR){
+        const ev=GAME_CONFIG.events[getRandomInt(0,GAME_CONFIG.events.length-1)];
+        showEventModal(ev);
+    }
+
+    runRivalFamilyTurns();
+    render();
+
+    if(eraChanged){
+        setTimeout(()=>showEventModal({title:eraChanged.title,description:eraChanged.description,choices:[{text:"Understood",effect:()=>{}}]}),400);
+    }
+}
+
+// =====================================================================
+//  INIT
+// =====================================================================
+function startNewGame(familyName, donFirstName) {
+    gameState.familyName = familyName || 'Corleone';
+    gameState.donFirstName = donFirstName || 'Vito';
+
+    const boss = createMember(true);
+    const nameParts = boss.name.split(' ');
+    boss.name = `Don ${donFirstName} ${familyName}`;
+    gameState.members.push(boss);
+
+    initializeRackets();
+    initializeRivals();
+    generateNewOpportunities();
+
+    $('#dynasty-title').textContent = `THE ${familyName.toUpperCase()} FAMILY`;
+    document.title = `${familyName} Family — Cosa Nostra`;
+
+    hookButtons();
+    render();
+}
+
+function hookButtons() {
+    $('#street-crime-btn').onclick = openStreetCrimeModal;
+    $('#recruit-btn').onclick = recruitMember;
+    $('#bribe-btn').onclick = bribePolice;
+    $('#favor-btn').onclick = openFavorModal;
+    $('#launder-btn').onclick = openLaunderModal;
+    $('#old-country-btn').onclick = openOldCountryModal;
+    $('#estate-btn').onclick = openEstateModal;
+    $('#map-btn').onclick = () => openMapModal();
+    $('#national-btn').onclick = openNationalMapModal;
+    $('#offshore-btn').onclick = openOffshoreModal;
+    $('#commission-btn').onclick = openCommissionModal;
+    $('#rival-intel-btn').onclick = openRivalIntelModal;
+    $('#next-year-btn').onclick = advanceYear;
+}
+
+// =====================================================================
+//  INTRO SCREEN
+// =====================================================================
+document.addEventListener('DOMContentLoaded', ()=>{
+    const hasSave = !!localStorage.getItem('cosanostra_save');
+    if(!hasSave) $('#continue-game-btn').disabled = true;
+
+    $('#start-game-btn').onclick = ()=>{
+        const family = ($('#family-name-input').value||'Corleone').trim();
+        const don = ($('#don-name-input').value||'Vito').trim();
+        if(!family){ $('#family-name-input').focus(); return; }
+        localStorage.removeItem('cosanostra_save');
+        $('#intro-screen').style.display='none';
+        $('#game-container').classList.remove('hidden');
+        startNewGame(family,don);
+    };
+
+    $('#continue-game-btn').onclick = ()=>{
+        if(loadGame()){
+            $('#intro-screen').style.display='none';
+            $('#game-container').classList.remove('hidden');
+            $('#dynasty-title').textContent=`THE ${gameState.familyName.toUpperCase()} FAMILY`;
+            document.title=`${gameState.familyName} Family — Cosa Nostra`;
+            hookButtons();
+            render();
+            showToast(`Welcome back, Don ${gameState.donFirstName}.`,'success');
+        }
+    };
+
+    // Enter key submits
+    [$('#family-name-input'),$('#don-name-input')].forEach(el=>{
+        el.addEventListener('keydown',e=>{ if(e.key==='Enter') $('#start-game-btn').click(); });
+    });
+});
+</script>
+</body>
+</html>
