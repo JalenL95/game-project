@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cosa Nostra: Generational Saga (Playable)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, sans-serif;
+      background: radial-gradient(circle at top, #2a2a2a 0%, #101010 55%, #060606 100%);
+      color: #e5e7eb;
+      min-height: 100vh;
+    }
+    .panel {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      backdrop-filter: blur(4px);
+    }
+    .btn-core {
+      transition: all 0.2s ease;
+    }
+    .btn-core:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(245, 158, 11, 0.25);
+    }
+    .btn-core:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .meter-bg {
+      background: #1f2937;
+      border-radius: 9999px;
+      overflow: hidden;
+      border: 1px solid #374151;
+    }
+    .meter-fill {
+      height: 100%;
+      transition: width 0.25s ease;
+    }
+    .card-hover {
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      border-color: rgba(245, 158, 11, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <div class="max-w-7xl mx-auto px-4 py-6 md:py-10">
+    <header class="text-center mb-8">
+      <h1 class="text-4xl md:text-6xl font-bold tracking-widest text-amber-300">COSA NOSTRA</h1>
+      <p class="text-sm md:text-base uppercase tracking-[0.35em] text-amber-500 mt-2">A Generational Saga</p>
+      <p class="text-gray-400 text-sm mt-3">Stabilized + polished build with save/load and premium-ready hooks.</p>
+    </header>
+
+    <section class="panel rounded-xl p-4 md:p-6 mb-6">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+        <div>
+          <p class="text-xs uppercase text-gray-400">Year</p>
+          <p id="year" class="text-2xl font-bold text-white">1946</p>
+        </div>
+        <div>
+          <p class="text-xs uppercase text-gray-400">Family</p>
+          <p id="crew" class="text-2xl font-bold text-white">3</p>
+        </div>
+        <div>
+          <p class="text-xs uppercase text-gray-400">Dirty Cash</p>
+          <p id="dirty" class="text-2xl font-bold text-red-400">$35,000</p>
+        </div>
+        <div>
+          <p class="text-xs uppercase text-gray-400">Clean Cash</p>
+          <p id="clean" class="text-2xl font-bold text-emerald-400">$15,000</p>
+        </div>
+        <div>
+          <p class="text-xs uppercase text-gray-400">Income / Year</p>
+          <p id="income" class="text-2xl font-bold text-amber-300">$0</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4 mt-5">
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span>Heat</span>
+            <span id="heat-label">0 / 100</span>
+          </div>
+          <div class="meter-bg h-3">
+            <div id="heat-fill" class="meter-fill bg-red-500" style="width:0%"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span>Federal Case File</span>
+            <span id="case-label">0 / 100</span>
+          </div>
+          <div class="meter-bg h-3">
+            <div id="case-fill" class="meter-fill bg-amber-500" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel rounded-xl p-4 md:p-6 mb-6">
+      <h2 class="text-xl font-bold text-amber-300 mb-3">Actions</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <button id="crimeBtn" class="btn-core bg-red-700 hover:bg-red-600 rounded-lg px-4 py-3 font-semibold">Street Crime (+Dirty, +Heat)</button>
+        <button id="launderBtn" class="btn-core bg-slate-700 hover:bg-slate-600 rounded-lg px-4 py-3 font-semibold">Launder (50% to Clean)</button>
+        <button id="recruitBtn" class="btn-core bg-amber-700 hover:bg-amber-600 rounded-lg px-4 py-3 font-semibold">Recruit Soldier</button>
+        <button id="bribeBtn" class="btn-core bg-blue-700 hover:bg-blue-600 rounded-lg px-4 py-3 font-semibold">Bribe Police (Reduce Heat)</button>
+        <button id="buyBizBtn" class="btn-core bg-emerald-700 hover:bg-emerald-600 rounded-lg px-4 py-3 font-semibold">Buy Front Business</button>
+        <button id="expandBtn" class="btn-core bg-purple-700 hover:bg-purple-600 rounded-lg px-4 py-3 font-semibold">Acquire Racket</button>
+        <button id="nextYearBtn" class="btn-core bg-zinc-700 hover:bg-zinc-600 rounded-lg px-4 py-3 font-semibold">Advance Year</button>
+        <button id="resetBtn" class="btn-core bg-zinc-900 hover:bg-black rounded-lg px-4 py-3 font-semibold border border-zinc-700">New Campaign</button>
+      </div>
+    </section>
+
+    <section class="grid lg:grid-cols-3 gap-6">
+      <article class="panel rounded-xl p-4 md:p-5 lg:col-span-2">
+        <h3 class="text-lg font-bold text-amber-300 mb-2">Empire Status</h3>
+        <div id="empireCards" class="grid md:grid-cols-2 gap-3"></div>
+      </article>
+
+      <aside class="panel rounded-xl p-4 md:p-5">
+        <h3 class="text-lg font-bold text-amber-300 mb-2">Campaign Tools</h3>
+        <div class="space-y-3">
+          <button id="saveBtn" class="btn-core w-full bg-slate-700 hover:bg-slate-600 rounded-lg px-4 py-2 font-semibold">Save Progress</button>
+          <button id="loadBtn" class="btn-core w-full bg-slate-700 hover:bg-slate-600 rounded-lg px-4 py-2 font-semibold">Load Save</button>
+          <button id="premiumBtn" class="btn-core w-full bg-gradient-to-r from-amber-600 to-yellow-500 text-black rounded-lg px-4 py-2 font-bold">Unlock Premium Tier ($4.99)</button>
+        </div>
+        <p class="text-xs text-gray-400 mt-3">
+          Premium unlock uses a local demo checkout hook now. Replace <code>launchCheckout()</code> with Stripe/PayPal in production.
+        </p>
+      </aside>
+    </section>
+
+    <section class="panel rounded-xl p-4 md:p-5 mt-6">
+      <h3 class="text-lg font-bold text-amber-300 mb-2">Game Log</h3>
+      <div id="log" class="h-56 overflow-y-auto text-sm leading-relaxed space-y-1"></div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "cosa_nostra_save_v1";
+
+    const config = {
+      recruitCost: 2800,
+      bribeCost: 12000,
+      bizCost: 25000,
+      bizIncome: 2200,
+      racketCost: 42000,
+      racketIncome: 5000,
+      upkeepPerCrew: 180,
+      baseHeatDecay: 8,
+      trialThreshold: 100
+    };
+
+    const state = {
+      year: 1946,
+      crew: 3,
+      dirty: 35000,
+      clean: 15000,
+      heat: 0,
+      caseFile: 0,
+      businesses: 0,
+      rackets: 0,
+      premium: false,
+      favors: 0,
+      alive: true
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function money(value) {
+      return "$" + Math.round(value).toLocaleString();
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function getIncome() {
+      let dirtyIncome = state.rackets * config.racketIncome;
+      let cleanIncome = state.businesses * config.bizIncome;
+      if (state.premium) {
+        dirtyIncome *= 1.15;
+        cleanIncome *= 1.2;
+      }
+      return { dirty: Math.floor(dirtyIncome), clean: Math.floor(cleanIncome) };
+    }
+
+    function log(msg, emphasis = false) {
+      const line = document.createElement("p");
+      line.className = emphasis ? "text-amber-200" : "text-gray-200";
+      line.textContent = "[" + state.year + "] " + msg;
+      const container = $("log");
+      container.prepend(line);
+    }
+
+    function renderEmpireCards() {
+      const income = getIncome();
+      const cards = [
+        {
+          title: "Rackets",
+          value: state.rackets,
+          note: "Primary dirty-cash engine.",
+          color: "border-red-600"
+        },
+        {
+          title: "Front Businesses",
+          value: state.businesses,
+          note: "Generates clean income + laundering capacity.",
+          color: "border-emerald-600"
+        },
+        {
+          title: "Crew Loyalty",
+          value: clamp(100 - Math.floor(state.heat / 2), 15, 100) + "%",
+          note: "Heat lowers morale and stability.",
+          color: "border-blue-600"
+        },
+        {
+          title: "Perks",
+          value: state.premium ? "Premium Active" : "Standard Tier",
+          note: state.premium ? "+income and safer growth." : "Unlock growth boosts and resilience.",
+          color: "border-amber-600"
+        }
+      ];
+
+      $("empireCards").innerHTML = cards.map((card) => `
+        <div class="card-hover border ${card.color} rounded-lg p-3 bg-black/30">
+          <p class="text-xs uppercase tracking-widest text-gray-400">${card.title}</p>
+          <p class="text-2xl font-bold text-white mt-1">${card.value}</p>
+          <p class="text-xs text-gray-400 mt-1">${card.note}</p>
+        </div>
+      `).join("");
+
+      $("income").textContent = money(income.dirty + income.clean);
+    }
+
+    function render() {
+      $("year").textContent = String(state.year);
+      $("crew").textContent = String(state.crew);
+      $("dirty").textContent = money(state.dirty);
+      $("clean").textContent = money(state.clean);
+      $("heat-label").textContent = Math.round(state.heat) + " / 100";
+      $("case-label").textContent = Math.round(state.caseFile) + " / 100";
+      $("heat-fill").style.width = clamp(state.heat, 0, 100) + "%";
+      $("case-fill").style.width = clamp(state.caseFile, 0, 100) + "%";
+      $("premiumBtn").textContent = state.premium ? "Premium Tier Unlocked" : "Unlock Premium Tier ($4.99)";
+      $("premiumBtn").disabled = state.premium;
+      renderEmpireCards();
+    }
+
+    function ensureAlive() {
+      if (!state.alive) {
+        log("Campaign ended. Start a New Campaign to play again.", true);
+        return false;
+      }
+      return true;
+    }
+
+    function doStreetCrime() {
+      if (!ensureAlive()) return;
+      const roll = Math.random();
+      if (roll < 0.72) {
+        state.dirty += 9000;
+        state.heat += 10;
+        log("Street shakedowns brought in " + money(9000) + ".");
+      } else {
+        state.dirty += 20000;
+        state.heat += 24;
+        state.caseFile += 6;
+        log("Major score: " + money(20000) + " but federal attention spikes.", true);
+      }
+      render();
+    }
+
+    function launderCash() {
+      if (!ensureAlive()) return;
+      const cap = 10000 + state.businesses * 6000 + (state.premium ? 10000 : 0);
+      const amount = Math.min(cap, state.dirty);
+      if (amount <= 0) {
+        log("No dirty cash available to launder.");
+        return;
+      }
+      const cleanGain = Math.floor(amount * 0.5);
+      state.dirty -= amount;
+      state.clean += cleanGain;
+      log("Laundered " + money(amount) + " into " + money(cleanGain) + " clean.");
+      render();
+    }
+
+    function recruit() {
+      if (!ensureAlive()) return;
+      if (state.dirty < config.recruitCost) {
+        log("Not enough dirty cash to recruit.");
+        return;
+      }
+      state.dirty -= config.recruitCost;
+      state.crew += 1;
+      state.heat += 1;
+      log("A new soldier was recruited for " + money(config.recruitCost) + ".");
+      render();
+    }
+
+    function bribe() {
+      if (!ensureAlive()) return;
+      if (state.clean < config.bribeCost) {
+        log("Not enough clean cash to bribe officials.");
+        return;
+      }
+      state.clean -= config.bribeCost;
+      const reduction = state.premium ? 22 : 16;
+      state.heat = clamp(state.heat - reduction, 0, 100);
+      state.caseFile = clamp(state.caseFile - 4, 0, 100);
+      log("Police palms were greased. Heat reduced by " + reduction + ".", true);
+      render();
+    }
+
+    function buyBusiness() {
+      if (!ensureAlive()) return;
+      if (state.clean < config.bizCost) {
+        log("Need " + money(config.bizCost) + " clean cash for a front business.");
+        return;
+      }
+      state.clean -= config.bizCost;
+      state.businesses += 1;
+      log("Purchased a legitimate front business.");
+      render();
+    }
+
+    function buyRacket() {
+      if (!ensureAlive()) return;
+      if (state.dirty < config.racketCost) {
+        log("Need " + money(config.racketCost) + " dirty cash to acquire a racket.");
+        return;
+      }
+      state.dirty -= config.racketCost;
+      state.rackets += 1;
+      state.heat += 5;
+      log("Acquired a new racket. Income climbs, so does attention.");
+      render();
+    }
+
+    function runFederalPressure() {
+      const pressure = state.heat / 10 + state.rackets * 1.2;
+      state.caseFile += pressure;
+      if (state.heat > 70 && Math.random() < 0.25) {
+        state.caseFile += 8;
+        log("Wiretap leak: federal case strengthened.", true);
+      }
+    }
+
+    function maybeRandomEvent() {
+      const roll = Math.random();
+      if (roll < 0.17) {
+        state.dirty += 12000;
+        log("Lucky shipment landed safely: +" + money(12000) + ".");
+      } else if (roll < 0.30) {
+        const loss = Math.min(state.dirty, 15000);
+        state.dirty -= loss;
+        state.heat += 7;
+        log("Rival interference cost you " + money(loss) + ".", true);
+      } else if (roll < 0.37) {
+        state.favors += 1;
+        log("You earned a political favor.");
+      }
+    }
+
+    function nextYear() {
+      if (!ensureAlive()) return;
+      state.year += 1;
+      const income = getIncome();
+      state.dirty += income.dirty;
+      state.clean += income.clean;
+
+      const upkeep = state.crew * config.upkeepPerCrew;
+      const dirtyPaid = Math.min(state.dirty, upkeep);
+      state.dirty -= dirtyPaid;
+      const remainder = upkeep - dirtyPaid;
+      if (remainder > 0) state.clean = Math.max(0, state.clean - remainder);
+
+      state.heat = Math.max(0, state.heat - config.baseHeatDecay - (state.premium ? 2 : 0));
+      runFederalPressure();
+      maybeRandomEvent();
+
+      if (state.caseFile >= config.trialThreshold) {
+        state.alive = false;
+        log("RICO Trial complete. The family empire collapsed.", true);
+      } else {
+        log("Year advanced. Upkeep paid: " + money(upkeep) + ".");
+      }
+      render();
+    }
+
+    function saveGame() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      log("Progress saved locally.");
+    }
+
+    function loadGame() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        log("No local save found.");
+        return;
+      }
+      const saved = JSON.parse(raw);
+      Object.assign(state, saved);
+      log("Save loaded.");
+      render();
+    }
+
+    function resetGame() {
+      Object.assign(state, {
+        year: 1946,
+        crew: 3,
+        dirty: 35000,
+        clean: 15000,
+        heat: 0,
+        caseFile: 0,
+        businesses: 0,
+        rackets: 0,
+        premium: false,
+        favors: 0,
+        alive: true
+      });
+      $("log").innerHTML = "";
+      log("New campaign started.", true);
+      render();
+    }
+
+    function launchCheckout() {
+      if (state.premium) return;
+      // Replace this with a real payment session endpoint in production.
+      const approved = window.confirm(
+        "Demo checkout: approve premium unlock for $4.99?\n\n" +
+        "In production, wire this to Stripe/PayPal and validate server-side."
+      );
+      if (!approved) return;
+      state.premium = true;
+      state.clean += 5000;
+      log("Premium Tier unlocked. Bonuses are now active.", true);
+      render();
+    }
+
+    $("crimeBtn").addEventListener("click", doStreetCrime);
+    $("launderBtn").addEventListener("click", launderCash);
+    $("recruitBtn").addEventListener("click", recruit);
+    $("bribeBtn").addEventListener("click", bribe);
+    $("buyBizBtn").addEventListener("click", buyBusiness);
+    $("expandBtn").addEventListener("click", buyRacket);
+    $("nextYearBtn").addEventListener("click", nextYear);
+    $("saveBtn").addEventListener("click", saveGame);
+    $("loadBtn").addEventListener("click", loadGame);
+    $("premiumBtn").addEventListener("click", launchCheckout);
+    $("resetBtn").addEventListener("click", resetGame);
+
+    log("Campaign initialized.");
+    render();
+  </script>
+</body>
+</html>
