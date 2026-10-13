@@ -57,6 +57,25 @@ Edit the `items` list. Order in the list = order on screen.
 - Sounds and music: `sounds`. Point them at `.ogg` or `.mp3` files; `null` = silent.
 - Effects: `background`. Every effect can be switched off or tuned: rain amount, droplets, lightning and how often, passing cars, each neon sign, each light, smoke emitters, parallax, film grain, vignette.
 
+### Frame-by-frame background animation
+The background can play a real animation instead of the still image: the same scene redrawn over several frames, like classic animation. Set `background.animation` in the config:
+
+```js
+animation: {
+  video: "assets/animation/bar.mp4",   // a looping clip (mp4 or webm)...
+  // ...or numbered images:
+  // frames: { pattern: "assets/animation/frame_###.jpg", count: 24 },
+  fps: 10,          // image frames only; 8-12 gives a hand-drawn feel
+  mode: "loop",     // or "pingpong" (1,2,3,2,1): hides a jump at the loop
+  blend: 0,         // 0 = hard cuts, 1 = soft cross-fade between frames
+  keepEffects: false
+}
+```
+
+While the animation plays, the painted-on rain, neon and smoke effects switch off (set `keepEffects: true` to keep them). Film grain, the vignette and the mouse parallax stay on. The still image shows until the frames finish loading. If the animation can't load, the menu falls back to the still image with effects.
+
+Frames should be 16:9, ideally 1280x720 or 1920x1080. The left part of the picture sits under the menu panel, so it doesn't matter what's there.
+
 ### Using a different background image
 1. Set `background.image`.
 2. Press F3 and move the mouse to read coordinates.
@@ -101,7 +120,7 @@ CosaMenu.show();  CosaMenu.hide();
 - Rain behind the window glass, in three depths with gusting wind.
 - Droplets that cling to the glass and slide down, leaving trails.
 - Lightning. The rain lights up and the room catches the flash.
-- Car headlights and tail lights passing outside, with reflections on the wet street.
+- Car headlights passing outside (off by default; turn on with `window.cars`).
 - Neon signs that hum, flicker and sometimes die and buzz back on. The rain picks up their colour.
 - Chandelier, lamps and sconce flicker gently, with an occasional power dip.
 - Cigar and cigarette smoke. The embers flare when someone takes a drag, then they exhale.

@@ -141,14 +141,118 @@
       ]);
       this.image = image;
       this.mask = mask;
-      this.fit = this.computeFit();
+      this.anim = await this.loadAnimation(bg.animation);
+      // with real animation playing, the painted-on effects are optional
+      this.effects = !this.anim || !!bg.animation.keepEffects;
+      this.fit = this.anim
+        ? this.computeFit(this.anim.width, this.anim.height)
+        : this.computeFit(image && image.naturalWidth, image && image.naturalHeight);
       this.buildEffects();
     }
 
-    computeFit() {
-      if (!this.image) return { x: 0, y: 0, s: 1, w: STAGE_W, h: STAGE_H };
-      const iw = this.image.naturalWidth;
-      const ih = this.image.naturalHeight;
+    /* ---------------- frame-by-frame / video background ---------------- */
+    async loadAnimation(a) {
+      if (!a || a.enabled === false) return null;
+
+      if (a.video) {
+        const v = document.createElement("video");
+        v.muted = true;
+        v.loop = true;
+        v.playsInline = true;
+        v.preload = "auto";
+        v.setAttribute("muted", "");
+        v.setAttribute("playsinline", "");
+        const ok = await new Promise((resolve) => {
+          const done = (r) => { clearTimeout(timer); resolve(r); };
+          const timer = setTimeout(() => done(false), 10000);
+          v.addEventListener("loadeddata", () => done(true), { once: true });
+          v.addEventListener("error", () => done(false), { once: true });
+          v.src = a.video;
+        });
+        if (!ok) {
+          console.warn("[menu] could not load background video:", a.video);
+        } else {
+          if (a.playbackRate) v.playbackRate = a.playbackRate;
+          const play = () => v.play().catch(() => {});
+          play();
+          // some browsers only start video after the first click or key press
+          window.addEventListener("pointerdown", play, { once: true });
+          window.addEventListener("keydown", play, { once: true });
+          return { type: "video", el: v, width: v.videoWidth, height: v.videoHeight };
+        }
+      }
+
+      let list = [];
+      if (Array.isArray(a.frames)) list = a.frames;
+      else if (a.frames && a.frames.pattern) {
+        const start = a.frames.start == null ? 1 : a.frames.start;
+        const pat = a.frames.pattern;
+        const m = pat.match(/#+/);
+        for (let i = 0; i < (a.frames.count || 0); i++) {
+          const n = String(start + i);
+          list.push(m ? pat.replace(m[0], n.padStart(m[0].length, "0")) : pat + n);
+        }
+      }
+      if (!list.length) return null;
+
+      const imgs = (await Promise.all(list.map(loadImage))).filter(Boolean);
+      if (!imgs.length) return null;
+      if (imgs.length < list.length) console.warn(`[menu] ${list.length - imgs.length} animation frame(s) failed to load`);
+      return {
+        type: "frames",
+        imgs,
+        fps: a.fps || 12,
+        mode: a.mode === "pingpong" ? "pingpong" : "loop",
+        blend: clamp(a.blend || 0, 0, 1),
+        t: 0,
+        width: imgs[0].naturalWidth,
+        height: imgs[0].naturalHeight
+      };
+    }
+
+    /* Which frame is showing, and how far into the next one (for blending). */
+    frameAt(anim) {
+      const n = anim.imgs.length;
+      if (n === 1) return { a: anim.imgs[0], b: null, k: 0 };
+      const f = anim.t * anim.fps;
+      const whole = Math.floor(f);
+      const k = f - whole;
+      let i, j;
+      if (anim.mode === "pingpong") {
+        const period = 2 * n - 2;
+        const p = whole % period;
+        const q = (p + 1) % period;
+        i = p < n ? p : period - p;
+        j = q < n ? q : period - q;
+      } else {
+        i = whole % n;
+        j = (i + 1) % n;
+      }
+      return { a: anim.imgs[i], b: anim.imgs[j], k };
+    }
+
+    drawBackground(ctx) {
+      const f = this.fit;
+      const anim = this.anim;
+      if (anim && anim.type === "video" && anim.el.readyState >= 2) {
+        ctx.drawImage(anim.el, f.x, f.y, f.w, f.h);
+        return;
+      }
+      if (anim && anim.type === "frames") {
+        const fr = this.frameAt(anim);
+        ctx.drawImage(fr.a, f.x, f.y, f.w, f.h);
+        if (anim.blend > 0 && fr.b && fr.k > 0) {
+          ctx.globalAlpha = smooth(fr.k) * anim.blend;
+          ctx.drawImage(fr.b, f.x, f.y, f.w, f.h);
+          ctx.globalAlpha = 1;
+        }
+        return;
+      }
+      if (this.image) ctx.drawImage(this.image, f.x, f.y, f.w, f.h);
+    }
+
+    computeFit(iw, ih) {
+      if (!iw || !ih) return { x: 0, y: 0, s: 1, w: STAGE_W, h: STAGE_H };
       const s = Math.max(STAGE_W / iw, STAGE_H / ih);
       return { s, w: iw * s, h: ih * s, x: (STAGE_W - iw * s) / 2, y: (STAGE_H - ih * s) / 2 };
     }
@@ -382,6 +486,8 @@
         bo.t = Math.max(0, bo.t - dt);
       }
 
+      if (this.anim && this.anim.type === "frames") this.anim.t += dt;
+      if (!this.effects) return;
       if (this.win) this.updateWindow(dt);
       this.updateNeon(dt);
       this.updateSmoke(dt);
@@ -633,10 +739,21 @@
       ctx.scale(CAMERA_ZOOM, CAMERA_ZOOM);
       ctx.translate(-STAGE_W / 2, -STAGE_H / 2);
 
-      const f = this.fit;
-      if (this.image) ctx.drawImage(this.image, f.x, f.y, f.w, f.h);
+      this.drawBackground(ctx);
 
-      if (bg.smokeSway && bg.smokeSway.enabled && this.image && !this.reducedMotion) this.drawSmokeSway(ctx);
+      if (this.effects) this.drawEffects(ctx);
+
+      if (this.debug) this.drawDebug(ctx);
+      ctx.restore();
+
+      /* screen space */
+      this.drawScreenSpace(ctx);
+    }
+
+    /* The painted-on effects layered over a still image. */
+    drawEffects(ctx) {
+      const bg = this.cfg;
+      if (bg.smokeSway && bg.smokeSway.enabled && this.image && !this.anim && !this.reducedMotion) this.drawSmokeSway(ctx);
 
       const room = this.roomLight();
 
@@ -662,11 +779,9 @@
         ctx.globalAlpha = 1;
         ctx.globalCompositeOperation = "source-over";
       }
+    }
 
-      if (this.debug) this.drawDebug(ctx);
-      ctx.restore();
-
-      /* screen space */
+    drawScreenSpace(ctx) {
       if (this.pulseLevel > 0) {
         ctx.globalCompositeOperation = "lighter";
         ctx.globalAlpha = this.pulseLevel * 0.16;

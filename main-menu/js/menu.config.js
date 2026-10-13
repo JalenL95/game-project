@@ -98,6 +98,30 @@ window.MENU_CONFIG = {
   /* ---------------- Background & effects ---------------- */
   background: {
     image: "assets/background.jpg",   // any 16:9 image, drawn to cover 1280x720
+                                      // (also shown while the animation loads)
+
+    /* Frame-by-frame animation. Give it EITHER a video clip OR a set of
+       numbered frames (same scene, drawn slightly differently each frame).
+       Leave both null to use the still image + painted-on effects below.
+
+       video:  "assets/animation/bar.mp4"         (mp4 / webm, loops)
+       frames: { pattern: "assets/animation/frame_###.jpg", count: 24, start: 1 }
+               ### becomes 001, 002 ... (use as many # as your file names have)
+               or a plain list: ["assets/animation/a.jpg", "assets/animation/b.jpg"]
+       fps:    frames per second for image frames (8-12 = hand-drawn feel)
+       mode:   "loop" (1,2,3,1,2,3) or "pingpong" (1,2,3,2,1)
+       blend:  0 = hard cuts between frames like classic animation,
+               1 = soft cross-fade between frames
+       keepEffects: true keeps the rain / neon / smoke effects on top */
+    animation: {
+      video: null,
+      frames: null,
+      fps: 10,
+      mode: "loop",
+      blend: 0,
+      keepEffects: false
+    },
+
     parallax: 10,                     // max px the scene drifts with the mouse (0 = off)
     drift: true,                      // slow "breathing" camera sway
     filmGrain: 0.06,                  // 0 = off
@@ -114,7 +138,7 @@ window.MENU_CONFIG = {
       droplets: 34,                   // drops sliding down the glass
       lightning: true,
       lightningEvery: [14, 30],       // seconds (random between)
-      cars: true,                     // headlights passing outside
+      cars: false,                    // headlights passing outside (off: the painted cars are parked)
       carsEvery: [9, 20]
     },
 
