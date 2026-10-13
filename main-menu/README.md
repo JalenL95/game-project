@@ -129,8 +129,9 @@ CosaMenu.show();  CosaMenu.hide();
 ## What's animated
 
 **Background**
-- The background is a looping video, `assets/animation/bar-loop.mp4`, with a `.webm` copy for browsers that can't play MP4. It was made from the concept art.
-- The loop is seamless: the last second of the original clip cross-fades into the first, so the 9-second loop has no jump.
+- The background is a looping video of a rainy 1940s street, `assets/animation/street-loop.mp4`, with a `.webm` copy for browsers that can't play MP4. It's flipped left-to-right so the man stands to the right of the menu panel.
+- The loop is seamless: the last 1.5 seconds of the original 8-second clip cross-fade into the start, giving a 6.5-second loop with no jump.
+- The earlier bar-interior video is still in `assets/animation/bar-loop.*`. To switch back, point `animation.video` at it.
 - The audio was removed from the video. Browsers only autoplay muted video.
 - The video plays as a real element on the page, because browsers pause hidden videos. A watchdog restarts it if the browser ever pauses or freezes it.
 - On top of the video: mouse parallax, a slow camera drift, film grain and a vignette.

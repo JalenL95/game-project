@@ -120,10 +120,10 @@ window.MENU_CONFIG = {
                1 = soft cross-fade between frames
        keepEffects: true keeps the rain / neon / smoke effects on top */
     animation: {
-      // Street scene: waiting for its animated clip (see assets/animation/PROMPT.md).
+      // Rainy street, mirrored so the man stands right of the menu panel.
       // Previous bar video, still available:
       //   video: ["assets/animation/bar-loop.mp4", "assets/animation/bar-loop.webm"],
-      video: null,
+      video: ["assets/animation/street-loop.mp4", "assets/animation/street-loop.webm"],
       frames: null,
       fps: 10,
       mode: "loop",
