@@ -202,6 +202,34 @@
         v.remove();
       }
 
+      if (a.slides && a.slides.images && a.slides.images.length) {
+        const sl = a.slides;
+        const entries = sl.images.map((it) => (typeof it === "string" ? { src: it } : it));
+        const imgs = await Promise.all(entries.map((e) => loadImage(e.src)));
+        let slides = entries
+          .map((e, i) => ({ img: imgs[i], focus: e.focus || [0.5, 0.5] }))
+          .filter((x) => x.img);
+        if (slides.length < entries.length) console.warn(`[menu] ${entries.length - slides.length} slide image(s) failed to load`);
+        if (slides.length) {
+          if (sl.shuffle) {
+            for (let i = slides.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [slides[i], slides[j]] = [slides[j], slides[i]];
+            }
+          }
+          return {
+            type: "slides",
+            slides,
+            duration: Math.max(1, sl.duration || 7),
+            fade: clamp(sl.fade == null ? 1.8 : sl.fade, 0, Math.max(1, sl.duration || 7)),
+            zoom: this.reducedMotion ? 1 : Math.max(1, sl.zoom || 1.1),
+            t: 0,
+            width: slides[0].img.naturalWidth,
+            height: slides[0].img.naturalHeight
+          };
+        }
+      }
+
       let list = [];
       if (Array.isArray(a.frames)) list = a.frames;
       else if (a.frames && a.frames.pattern) {
@@ -279,6 +307,43 @@
       }
     }
 
+    /* Slideshow: each picture slowly pushes in or pulls out (the
+       "Ken Burns" move) and dissolves into the next one. */
+    drawSlides(ctx, anim) {
+      const n = anim.slides.length;
+      const k = Math.floor(anim.t / anim.duration);
+      const local = anim.t - k * anim.duration;
+      const span = anim.duration + anim.fade;
+      if (k > 0 && local < anim.fade && n > 1) {
+        this.drawSlide(ctx, anim, k - 1, (local + anim.duration) / span, 1);
+        this.drawSlide(ctx, anim, k, local / span, smooth(local / anim.fade));
+      } else {
+        this.drawSlide(ctx, anim, k, local / span, 1);
+      }
+    }
+
+    drawSlide(ctx, anim, k, p, alpha) {
+      const slide = anim.slides[k % anim.slides.length];
+      const img = slide.img;
+      const iw = img.naturalWidth;
+      const ih = img.naturalHeight;
+      const base = Math.max(STAGE_W / iw, STAGE_H / ih);
+      // alternate pushing in and pulling out so consecutive slides feel different
+      const zoomIn = k % 2 === 0;
+      const z = zoomIn ? lerp(1, anim.zoom, p) : lerp(anim.zoom, 1, p);
+      const f = slide.focus;
+      const fx = zoomIn ? lerp(0.5, f[0], p) : lerp(f[0], 0.5, p);
+      const fy = zoomIn ? lerp(0.5, f[1], p) : lerp(f[1], 0.5, p);
+      const dw = iw * base * z;
+      const dh = ih * base * z;
+      // keep the picture covering the whole stage while it drifts
+      const cx = clamp(fx, STAGE_W / (2 * dw), 1 - STAGE_W / (2 * dw));
+      const cy = clamp(fy, STAGE_H / (2 * dh), 1 - STAGE_H / (2 * dh));
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(img, STAGE_W / 2 - cx * dw, STAGE_H / 2 - cy * dh, dw, dh);
+      ctx.globalAlpha = 1;
+    }
+
     drawBackground(ctx) {
       const f = this.fit;
       const anim = this.anim;
@@ -286,6 +351,10 @@
         // the <video> element shows itself behind the canvas; just move it with the camera
         anim.el.style.transform =
           `translate(${this.cam.x.toFixed(2)}px, ${this.cam.y.toFixed(2)}px) scale(${CAMERA_ZOOM})`;
+        return;
+      }
+      if (anim && anim.type === "slides") {
+        this.drawSlides(ctx, anim);
         return;
       }
       if (anim && anim.type === "frames") {
@@ -536,7 +605,7 @@
         bo.t = Math.max(0, bo.t - dt);
       }
 
-      if (this.anim && this.anim.type === "frames") this.anim.t += dt;
+      if (this.anim && (this.anim.type === "frames" || this.anim.type === "slides")) this.anim.t += dt;
       if (this.anim && this.anim.type === "video") this.watchVideo(dt);
       if (!this.effects) return;
       if (this.win) this.updateWindow(dt);

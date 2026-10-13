@@ -76,6 +76,9 @@ While the animation plays, the painted-on rain, neon and smoke effects switch of
 
 Frames should be 16:9, ideally 1280x720 or 1920x1080. The left part of the picture sits under the menu panel, so it doesn't matter what's there.
 
+### Changing the slideshow
+Put 16:9 pictures in `assets/slides/` and list them in `animation.slides.images`. Each entry can have a `focus` point, which is where the slow push-in heads, written as `[x, y]` from 0 to 1 (for example `[0.75, 0.5]` = right of centre). Keep the important part of each picture in the right two-thirds; the menu panel covers the left third.
+
 ### Replacing the background video
 1. Put the new clip in `assets/animation/`.
 2. Point `animation.video` at it.
@@ -129,13 +132,12 @@ CosaMenu.show();  CosaMenu.hide();
 ## What's animated
 
 **Background**
-- The background is a looping video of a rainy 1940s street, `assets/animation/street-loop.mp4`, with a `.webm` copy for browsers that can't play MP4. It's flipped left-to-right so the man stands to the right of the menu panel.
-- The loop is seamless: the last 1.5 seconds of the original 8-second clip cross-fade into the start, giving a 6.5-second loop with no jump.
-- The earlier bar-interior video is still in `assets/animation/bar-loop.*`. To switch back, point `animation.video` at it.
-- The audio was removed from the video. Browsers only autoplay muted video.
-- The video plays as a real element on the page, because browsers pause hidden videos. A watchdog restarts it if the browser ever pauses or freezes it.
-- On top of the video: mouse parallax, a slow camera drift, film grain and a vignette.
-- The older painted-on effects (rain on the glass, flickering neon, lamp glow, cigar smoke, dust) are still built in for use over a still image. They're off now (`background.effects: false`) because the video has the real thing.
+- A slideshow of four noir scenes: hotel lobby, diner, barber shop and warehouse (`assets/slides/`).
+- Each picture slowly pushes in toward the man, or pulls back out, then dissolves into the next. They alternate so consecutive slides feel different. After the last one it loops.
+- The lobby, diner and barber shop are flipped left-to-right so the man isn't hidden behind the menu panel. The originals are 1024px wide; these are cleaned up and upscaled to 1080p.
+- Timing, zoom, order and the point each slide drifts toward are set in `background.animation.slides`.
+- The earlier videos (`assets/animation/street-loop.*` and `bar-loop.*`) are still there. Point `animation.video` at one to switch back; a video takes priority over the slideshow.
+- On top: mouse parallax, a slow camera drift, film grain and a vignette.
 
 **Menu**
 - Intro: fade in, panel slides in, title letters close up, buttons cascade in. Any key or click skips it.

@@ -116,6 +116,7 @@ window.MENU_CONFIG = {
                or a plain list: ["assets/animation/a.jpg", "assets/animation/b.jpg"]
        fps:    frames per second for image frames (8-12 = hand-drawn feel)
        mode:   "loop" (1,2,3,1,2,3) or "pingpong" (1,2,3,2,1)
+       slides: a slideshow of still pictures (see below)
        blend:  0 = hard cuts between frames like classic animation,
                1 = soft cross-fade between frames
        keepEffects: true keeps the rain / neon / smoke effects on top */
@@ -123,7 +124,27 @@ window.MENU_CONFIG = {
       // Rainy street, mirrored so the man stands right of the menu panel.
       // Previous bar video, still available:
       //   video: ["assets/animation/bar-loop.mp4", "assets/animation/bar-loop.webm"],
-      video: ["assets/animation/street-loop.mp4", "assets/animation/street-loop.webm"],
+      video: null,
+      // Rainy-street video, still available:
+      //   video: ["assets/animation/street-loop.mp4", "assets/animation/street-loop.webm"],
+
+      /* Slideshow: each picture slowly pushes in toward its focus point (or
+         pulls back out), then dissolves into the next. Used when video is null.
+         focus = where to drift toward, as [x, y] from 0 to 1 (0.5 = centre).
+         Pictures with the man on the left were flipped so he isn't hidden
+         behind the menu panel. */
+      slides: {
+        images: [
+          { src: "assets/slides/01-hotel-lobby.jpg",  focus: [0.74, 0.55] },
+          { src: "assets/slides/02-diner.jpg",        focus: [0.78, 0.48] },
+          { src: "assets/slides/03-barber-shop.jpg",  focus: [0.68, 0.55] },
+          { src: "assets/slides/04-warehouse.jpg",    focus: [0.80, 0.55] }
+        ],
+        duration: 7,      // seconds each picture is on screen
+        fade: 1.8,        // seconds the dissolve between pictures takes
+        zoom: 1.1,        // how far the slow push-in goes (1 = no movement)
+        shuffle: false    // true = random order each time the menu opens
+      },
       frames: null,
       fps: 10,
       mode: "loop",
