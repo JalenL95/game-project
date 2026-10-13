@@ -920,20 +920,132 @@
   }
 
   function unlockAudio() {
+    if (synth.ctx && synth.ctx.state === "suspended") synth.ctx.resume().catch(() => {});
     if (audioUnlocked) return;
     audioUnlocked = true;
+    initSynth();
     for (const key of ["music", "ambience"]) {
       if (sounds[key]) sounds[key].play().catch(() => {});
     }
   }
 
-  function sfx(name) {
-    const base = sounds[name];
-    if (!base || !audioUnlocked) return;
-    const a = base.cloneNode();
+  function volume() {
     const v = cfg.sounds && cfg.sounds.volume;
-    a.volume = v == null ? 0.7 : v;
-    a.play().catch(() => {});
+    return v == null ? 0.7 : v;
+  }
+
+  function sfx(name) {
+    if (!audioUnlocked) return;
+    const base = sounds[name];
+    if (base) {
+      const a = base.cloneNode();
+      a.volume = volume();
+      a.play().catch(() => {});
+      return;
+    }
+    if (cfg.sounds && cfg.sounds.synth === false) return;
+    playSynth(name);
+  }
+
+  /* ---------- built-in sounds (made in code, no files needed) ----------
+     Used for any slot in cfg.sounds that has no file. Browsers only allow
+     sound after the first click or key press. */
+  const synth = { ctx: null, out: null, noise: null, lastHover: 0 };
+
+  function initSynth() {
+    if (synth.ctx || (cfg.sounds && cfg.sounds.synth === false)) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const ctx = new AC();
+    const out = ctx.createGain();
+    out.gain.value = volume();
+    // gentle compression keeps layered sounds from clipping
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -14;
+    comp.ratio.value = 4;
+    out.connect(comp).connect(ctx.destination);
+    const noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    const data = noise.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    Object.assign(synth, { ctx, out, noise });
+    if (ctx.state === "suspended") ctx.resume().catch(() => {});
+  }
+
+  /* envelope: quick attack, exponential fall */
+  function env(g, t, peak, decay, attack) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + (attack || 0.002));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + (attack || 0.002) + decay);
+  }
+
+  function tone(t, freq, peak, decay, type, toFreq, attack) {
+    const { ctx, out } = synth;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type || "sine";
+    o.frequency.setValueAtTime(freq, t);
+    if (toFreq) o.frequency.exponentialRampToValueAtTime(toFreq, t + decay);
+    env(g, t, peak, decay, attack);
+    o.connect(g).connect(out);
+    o.start(t);
+    o.stop(t + decay + 0.05);
+    return g;
+  }
+
+  function noiseBurst(t, freq, q, peak, decay, kind) {
+    const { ctx, out, noise } = synth;
+    const src = ctx.createBufferSource();
+    src.buffer = noise;
+    const f = ctx.createBiquadFilter();
+    f.type = kind || "bandpass";
+    f.frequency.value = freq;
+    f.Q.value = q;
+    const g = ctx.createGain();
+    env(g, t, peak, decay, 0.001);
+    src.connect(f).connect(g).connect(out);
+    src.start(t, Math.random() * 0.5);
+    src.stop(t + decay + 0.05);
+  }
+
+  /* a small hotel-desk bell: a few inharmonic partials ringing out */
+  function bell(t, base, peak) {
+    const partials = [[1, 1, 1.5], [2.0, 0.42, 1.0], [2.76, 0.3, 0.7], [5.4, 0.12, 0.35]];
+    for (const [ratio, gain, decay] of partials) tone(t, base * ratio, peak * gain, decay);
+  }
+
+  function playSynth(name) {
+    if (!synth.ctx) initSynth();
+    const ctx = synth.ctx;
+    if (!ctx) return;
+    const t = ctx.currentTime + 0.005;
+    switch (name) {
+      case "hover": {
+        // brass switch tick
+        const now = performance.now();
+        if (now - synth.lastHover < 35) return;
+        synth.lastHover = now;
+        noiseBurst(t, 3200, 4, 0.32, 0.035);
+        tone(t, 2300, 0.05, 0.04);
+        tone(t, 190, 0.07, 0.05);
+        break;
+      }
+      case "select":
+        // heavy click, a low thunk, then the bell
+        noiseBurst(t, 1800, 0.8, 0.35, 0.02, "highpass");
+        tone(t, 150, 0.5, 0.22, "sine", 52);
+        bell(t + 0.03, 659.25, 0.16);
+        break;
+      case "back":
+        noiseBurst(t, 1400, 3, 0.22, 0.03);
+        tone(t, 330, 0.12, 0.13, "triangle", 210);
+        break;
+      case "error":
+        for (const dt of [0, 0.11]) tone(t + dt, 98, 0.1, 0.075, "square");
+        tone(t, 70, 0.18, 0.2, "sine");
+        break;
+      default:
+        break;
+    }
   }
 
   /* =================================================================

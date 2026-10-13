@@ -54,7 +54,7 @@ Edit the `items` list. Order in the list = order on screen.
 - Key hints: `hints`.
 - Colours and panel width: `theme`.
 - Intro, wrap-around and number of blinks: `playIntro`, `wrapNavigation`, `selectBlinks`.
-- Sounds and music: `sounds`. Point them at `.ogg` or `.mp3` files; `null` = silent.
+- Sounds and music: `sounds`. Built-in button sounds are made in code: a brass click on move, a thunk and a desk bell on pick, a soft click on back, a low buzz on a locked button. Point a slot at an `.ogg` or `.mp3` file to replace that sound, or set `synth: false` for silence. Sound starts after the first click or key press, which browsers require.
 - Effects: `background`. Every effect can be switched off or tuned: rain amount, droplets, lightning and how often, passing cars, each neon sign, each light, smoke emitters, parallax, film grain, vignette.
 
 ### Frame-by-frame background animation
@@ -132,6 +132,7 @@ CosaMenu.show();  CosaMenu.hide();
 - The background is a looping video, `assets/animation/bar-loop.mp4`, with a `.webm` copy for browsers that can't play MP4. It was made from the concept art.
 - The loop is seamless: the last second of the original clip cross-fades into the first, so the 9-second loop has no jump.
 - The audio was removed from the video. Browsers only autoplay muted video.
+- The video plays as a real element on the page, because browsers pause hidden videos. A watchdog restarts it if the browser ever pauses or freezes it.
 - On top of the video: mouse parallax, a slow camera drift, film grain and a vignette.
 - The older painted-on effects (rain on the glass, flickering neon, lamp glow, cigar smoke, dust) are still built in for use over a still image. They're off now (`background.effects: false`) because the video has the real thing.
 

@@ -67,6 +67,17 @@ body.hide-cursor, body.hide-cursor * { cursor: none !important; }
   background: #050403;
 }
 
+.bg-video {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1280px;
+  height: 720px;
+  object-fit: cover;
+  transform-origin: 50% 50%;
+  pointer-events: none;
+}
+
 #scene, #fx {
   position: absolute;
   left: 0;

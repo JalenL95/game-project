@@ -82,11 +82,15 @@ window.MENU_CONFIG = {
     panelWidth:  440            // px on the 1280-wide stage
   },
 
-  /* ---------------- Sound (optional) ----------------
-     Paths to audio files. Leave null for silence.
+  /* ---------------- Sound ----------------
+     Built-in sounds play by default: a brass click when moving between
+     buttons, a thunk + bell when picking one, a softer click for back,
+     and a low buzz for a locked button. Point a slot at an audio file to
+     replace that sound, or set synth: false for silence.
      Browsers only allow sound after the first click or key press. */
   sounds: {
-    hover:  null,              // e.g. "assets/sfx/hover.ogg"
+    synth:  true,              // built-in button sounds for any slot below left as null
+    hover:  null,              // e.g. "assets/sfx/hover.ogg" to use your own file
     select: null,
     back:   null,
     error:  null,

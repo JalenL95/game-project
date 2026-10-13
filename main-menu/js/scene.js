@@ -162,6 +162,12 @@
         v.preload = "auto";
         v.setAttribute("muted", "");
         v.setAttribute("playsinline", "");
+        v.setAttribute("aria-hidden", "true");
+        v.disablePictureInPicture = true;
+        // The video sits on the page behind the canvas. Browsers pause or
+        // freeze videos that aren't on the page, so it can't stay hidden.
+        v.className = "bg-video";
+        this.canvas.parentNode.insertBefore(v, this.canvas);
         const tryLoad = (src) => new Promise((resolve) => {
           const done = (r) => {
             clearTimeout(timer);
@@ -191,8 +197,9 @@
           // some browsers only start video after the first click or key press
           window.addEventListener("pointerdown", play, { once: true });
           window.addEventListener("keydown", play, { once: true });
-          return { type: "video", el: v, width: v.videoWidth, height: v.videoHeight };
+          return { type: "video", el: v, width: v.videoWidth, height: v.videoHeight, play, lastTime: -1, stall: 0 };
         }
+        v.remove();
       }
 
       let list = [];
@@ -244,11 +251,41 @@
       return { a: anim.imgs[i], b: anim.imgs[j], k };
     }
 
+    /* Keep the video running: restart it if the browser paused or froze it. */
+    watchVideo(dt) {
+      const a = this.anim;
+      const v = a.el;
+      if (document.hidden) return;
+      if (v.paused || v.ended) {
+        a.stall += dt;
+        if (a.stall > 0.5) {
+          a.stall = 0;
+          a.play();
+        }
+        return;
+      }
+      if (v.currentTime === a.lastTime) {
+        a.stall += dt;
+        if (a.stall > 1.5) {
+          // stuck on one frame while "playing": nudge it
+          a.stall = 0;
+          const t = v.currentTime;
+          v.currentTime = t + 0.04 < v.duration ? t + 0.04 : 0;
+          a.play();
+        }
+      } else {
+        a.stall = 0;
+        a.lastTime = v.currentTime;
+      }
+    }
+
     drawBackground(ctx) {
       const f = this.fit;
       const anim = this.anim;
-      if (anim && anim.type === "video" && anim.el.readyState >= 2) {
-        ctx.drawImage(anim.el, f.x, f.y, f.w, f.h);
+      if (anim && anim.type === "video") {
+        // the <video> element shows itself behind the canvas; just move it with the camera
+        anim.el.style.transform =
+          `translate(${this.cam.x.toFixed(2)}px, ${this.cam.y.toFixed(2)}px) scale(${CAMERA_ZOOM})`;
         return;
       }
       if (anim && anim.type === "frames") {
@@ -500,6 +537,7 @@
       }
 
       if (this.anim && this.anim.type === "frames") this.anim.t += dt;
+      if (this.anim && this.anim.type === "video") this.watchVideo(dt);
       if (!this.effects) return;
       if (this.win) this.updateWindow(dt);
       this.updateNeon(dt);
@@ -743,8 +781,12 @@
       ctx.setTransform(s, 0, 0, s, 0, 0);
       ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 1;
-      ctx.fillStyle = "#050403";
-      ctx.fillRect(0, 0, STAGE_W, STAGE_H);
+      if (this.anim && this.anim.type === "video") {
+        ctx.clearRect(0, 0, STAGE_W, STAGE_H);   // see-through: the video is underneath
+      } else {
+        ctx.fillStyle = "#050403";
+        ctx.fillRect(0, 0, STAGE_W, STAGE_H);
+      }
 
       /* camera space */
       ctx.save();
@@ -1035,8 +1077,10 @@
       this.grainFrame = ((this.grainFrame || 0) + 1) % (this.grainPatterns.length * 2);
       const pat = this.grainPatterns[this.grainFrame >> 1];
       ctx.save();
-      ctx.globalCompositeOperation = "overlay";
-      ctx.globalAlpha = this.cfg.filmGrain;
+      // over a see-through canvas "overlay" has nothing to blend with, so lay the grain on lightly
+      const overVideo = this.anim && this.anim.type === "video";
+      ctx.globalCompositeOperation = overVideo ? "source-over" : "overlay";
+      ctx.globalAlpha = this.cfg.filmGrain * (overVideo ? 0.45 : 1);
       ctx.translate(-((Math.random() * 192) | 0), -((Math.random() * 192) | 0));
       ctx.fillStyle = pat;
       ctx.fillRect(0, 0, STAGE_W + 192, STAGE_H + 192);
