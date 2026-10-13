@@ -97,14 +97,16 @@ window.MENU_CONFIG = {
 
   /* ---------------- Background & effects ---------------- */
   background: {
-    image: "assets/background.jpg",   // any 16:9 image, drawn to cover 1280x720
-                                      // (also shown while the animation loads)
+    image: "assets/background.jpg",   // still image: shown if the video can't play, and
+                                      // blurred behind the letterbox bars on odd screen shapes
 
     /* Frame-by-frame animation. Give it EITHER a video clip OR a set of
        numbered frames (same scene, drawn slightly differently each frame).
        Leave both null to use the still image + painted-on effects below.
 
        video:  "assets/animation/bar.mp4"         (mp4 / webm, loops)
+               or a list, best first: ["bar.mp4", "bar.webm"]; the browser
+               plays the first one it supports
        frames: { pattern: "assets/animation/frame_###.jpg", count: 24, start: 1 }
                ### becomes 001, 002 ... (use as many # as your file names have)
                or a plain list: ["assets/animation/a.jpg", "assets/animation/b.jpg"]
@@ -114,13 +116,20 @@ window.MENU_CONFIG = {
                1 = soft cross-fade between frames
        keepEffects: true keeps the rain / neon / smoke effects on top */
     animation: {
-      video: null,
+      video: ["assets/animation/bar-loop.mp4", "assets/animation/bar-loop.webm"],
       frames: null,
       fps: 10,
       mode: "loop",
       blend: 0,
       keepEffects: false
     },
+
+    /* Painted-on effects (rain, neon, lamps, smoke, dust) for a STILL image.
+       Off: the animated background has all of this for real. Their positions
+       below were placed for the original concept art (assets/concept-original.webp);
+       if you turn them back on, re-align them with F3. Film grain, vignette and
+       parallax are separate and stay on. */
+    effects: false,
 
     parallax: 10,                     // max px the scene drifts with the mouse (0 = off)
     drift: true,                      // slow "breathing" camera sway

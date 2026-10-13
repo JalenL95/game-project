@@ -76,6 +76,18 @@ While the animation plays, the painted-on rain, neon and smoke effects switch of
 
 Frames should be 16:9, ideally 1280x720 or 1920x1080. The left part of the picture sits under the menu panel, so it doesn't matter what's there.
 
+### Replacing the background video
+1. Put the new clip in `assets/animation/`.
+2. Point `animation.video` at it.
+
+For a smooth loop, make the clip end on the same picture it starts with. If it doesn't, cross-fade the end into the start with ffmpeg (24 fps, 10 s clip, 1 s blend):
+
+```
+ffmpeg -i in.mp4 -filter_complex "[0:v]split=3[a][b][c];[a]trim=start_frame=216:end_frame=240,setpts=PTS-STARTPTS[t];[b]trim=end_frame=24,setpts=PTS-STARTPTS[h];[c]trim=start_frame=24:end_frame=216,setpts=PTS-STARTPTS[m];[t][h]xfade=duration=1:offset=0[x];[x][m]concat=n=2:v=1:a=0,format=yuv420p" -an -c:v libx264 -crf 18 -movflags +faststart bar-loop.mp4
+ffmpeg -i bar-loop.mp4 -c:v libvpx-vp9 -b:v 0 -crf 30 bar-loop.webm
+ffmpeg -i bar-loop.mp4 -frames:v 1 background.jpg
+```
+
 ### Using a different background image
 1. Set `background.image`.
 2. Press F3 and move the mouse to read coordinates.
@@ -117,16 +129,11 @@ CosaMenu.show();  CosaMenu.hide();
 ## What's animated
 
 **Background**
-- Rain behind the window glass, in three depths with gusting wind.
-- Droplets that cling to the glass and slide down, leaving trails.
-- Lightning. The rain lights up and the room catches the flash.
-- Car headlights passing outside (off by default; turn on with `window.cars`).
-- Neon signs that hum, flicker and sometimes die and buzz back on. The rain picks up their colour.
-- Chandelier, lamps and sconce flicker gently, with an occasional power dip.
-- Cigar and cigarette smoke. The embers flare when someone takes a drag, then they exhale.
-- The painted smoke plume sways slowly.
-- Dust drifts in the chandelier light.
-- Mouse parallax, a slow camera drift, film grain and a vignette.
+- The background is a looping video, `assets/animation/bar-loop.mp4`, with a `.webm` copy for browsers that can't play MP4. It was made from the concept art.
+- The loop is seamless: the last second of the original clip cross-fades into the first, so the 9-second loop has no jump.
+- The audio was removed from the video. Browsers only autoplay muted video.
+- On top of the video: mouse parallax, a slow camera drift, film grain and a vignette.
+- The older painted-on effects (rain on the glass, flickering neon, lamp glow, cigar smoke, dust) are still built in for use over a still image. They're off now (`background.effects: false`) because the video has the real thing.
 
 **Menu**
 - Intro: fade in, panel slides in, title letters close up, buttons cascade in. Any key or click skips it.

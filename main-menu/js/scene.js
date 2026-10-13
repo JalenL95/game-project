@@ -143,7 +143,7 @@
       this.mask = mask;
       this.anim = await this.loadAnimation(bg.animation);
       // with real animation playing, the painted-on effects are optional
-      this.effects = !this.anim || !!bg.animation.keepEffects;
+      this.effects = bg.effects !== false && (!this.anim || !!bg.animation.keepEffects);
       this.fit = this.anim
         ? this.computeFit(this.anim.width, this.anim.height)
         : this.computeFit(image && image.naturalWidth, image && image.naturalHeight);
@@ -162,16 +162,29 @@
         v.preload = "auto";
         v.setAttribute("muted", "");
         v.setAttribute("playsinline", "");
-        const ok = await new Promise((resolve) => {
-          const done = (r) => { clearTimeout(timer); resolve(r); };
+        const tryLoad = (src) => new Promise((resolve) => {
+          const done = (r) => {
+            clearTimeout(timer);
+            v.removeEventListener("loadeddata", onLoad);
+            v.removeEventListener("error", onError);
+            resolve(r);
+          };
+          const onLoad = () => done(true);
+          const onError = () => done(false);
           const timer = setTimeout(() => done(false), 10000);
-          v.addEventListener("loadeddata", () => done(true), { once: true });
-          v.addEventListener("error", () => done(false), { once: true });
-          v.src = a.video;
+          v.addEventListener("loadeddata", onLoad);
+          v.addEventListener("error", onError);
+          v.src = src;
         });
-        if (!ok) {
-          console.warn("[menu] could not load background video:", a.video);
-        } else {
+        // a list of files: try each in order until one plays in this browser
+        const sources = Array.isArray(a.video) ? a.video : [a.video];
+        let ok = false;
+        for (const src of sources) {
+          ok = await tryLoad(src);
+          if (ok) break;
+          console.warn("[menu] could not play background video:", src);
+        }
+        if (ok) {
           if (a.playbackRate) v.playbackRate = a.playbackRate;
           const play = () => v.play().catch(() => {});
           play();
