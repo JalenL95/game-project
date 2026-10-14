@@ -913,10 +913,60 @@
         const a = new Audio(s[key]);
         a.loop = true;
         a.preload = "auto";
-        a.volume = (s.volume == null ? 0.7 : s.volume) * (key === "music" ? 0.6 : 0.8);
+        a.volume = 0;           // faded in once the player first clicks or presses a key
         sounds[key] = a;
       }
     }
+    loadVolumes();
+    // stop the music while the game window is hidden or minimised
+    document.addEventListener("visibilitychange", () => {
+      for (const key of ["music", "ambience"]) {
+        const a = sounds[key];
+        if (!a || !audioUnlocked || a.dataset.stopped) continue;
+        if (document.hidden) a.pause();
+        else a.play().catch(() => {});
+      }
+    });
+  }
+
+  /* ---------- volume levels (0 to 1), remembered between sessions ---------- */
+  const VOLUME_KEY = "cosamenu.volume";
+  const levels = { music: 0.4, sfx: 0.7 };
+  function loadVolumes() {
+    const s = cfg.sounds || {};
+    if (s.musicVolume != null) levels.music = clamp(s.musicVolume, 0, 1);
+    if (s.volume != null) levels.sfx = clamp(s.volume, 0, 1);
+    try {
+      const saved = JSON.parse(localStorage.getItem(VOLUME_KEY) || "null");
+      if (saved && typeof saved.music === "number") levels.music = clamp(saved.music, 0, 1);
+      if (saved && typeof saved.sfx === "number") levels.sfx = clamp(saved.sfx, 0, 1);
+    } catch (e) { /* storage blocked: use the config levels */ }
+  }
+  function saveVolumes() {
+    try { localStorage.setItem(VOLUME_KEY, JSON.stringify(levels)); } catch (e) { /* ignore */ }
+  }
+
+  /* Smoothly move a looping track's volume. */
+  const fades = new Map();
+  function fadeTrack(a, to, ms) {
+    cancelAnimationFrame(fades.get(a));
+    const from = a.volume;
+    const start = performance.now();
+    const step = (now) => {
+      const k = ms > 0 ? clamp((now - start) / ms, 0, 1) : 1;
+      a.volume = clamp(from + (to - from) * k, 0, 1);
+      if (k < 1) fades.set(a, requestAnimationFrame(step));
+    };
+    fades.set(a, requestAnimationFrame(step));
+  }
+  function trackLevel(key) {
+    return key === "music" ? levels.music : levels.music * 0.8;
+  }
+  function startTrack(key, ms) {
+    const a = sounds[key];
+    if (!a) return;
+    delete a.dataset.stopped;
+    a.play().then(() => fadeTrack(a, trackLevel(key), ms)).catch(() => {});
   }
 
   function unlockAudio() {
@@ -924,14 +974,12 @@
     if (audioUnlocked) return;
     audioUnlocked = true;
     initSynth();
-    for (const key of ["music", "ambience"]) {
-      if (sounds[key]) sounds[key].play().catch(() => {});
-    }
+    startTrack("music", 3000);
+    startTrack("ambience", 3000);
   }
 
   function volume() {
-    const v = cfg.sounds && cfg.sounds.volume;
-    return v == null ? 0.7 : v;
+    return levels.sfx;
   }
 
   function sfx(name) {
@@ -1363,6 +1411,38 @@
     },
 
     show, hide, toast, placeholder,
+
+    /* Volume controls for your Options screen (0 to 1, saved automatically). */
+    getMusicVolume() { return levels.music; },
+    getSfxVolume() { return levels.sfx; },
+    setMusicVolume(v) {
+      levels.music = clamp(Number(v) || 0, 0, 1);
+      saveVolumes();
+      for (const key of ["music", "ambience"]) {
+        if (sounds[key] && !sounds[key].dataset.stopped) fadeTrack(sounds[key], trackLevel(key), 150);
+      }
+      return api;
+    },
+    setSfxVolume(v) {
+      levels.sfx = clamp(Number(v) || 0, 0, 1);
+      saveVolumes();
+      if (synth.out) synth.out.gain.value = levels.sfx;
+      return api;
+    },
+    /** Fade the menu music out (e.g. when the game itself starts) or back in. */
+    stopMusic(ms) {
+      const a = sounds.music;
+      if (a) {
+        a.dataset.stopped = "1";
+        fadeTrack(a, 0, ms == null ? 1500 : ms);
+      }
+      return api;
+    },
+    playMusic(ms) {
+      if (audioUnlocked) startTrack("music", ms == null ? 1500 : ms);
+      return api;
+    },
+    get music() { return sounds.music || null; },
     confirm: confirmDialog,
     get scene() { return scene; }
   };

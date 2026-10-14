@@ -115,6 +115,21 @@ When an item is picked, the button blinks, sparks fly and the screen fades to bl
 
 Every pick also fires a `cosamenu:action` event on `window`.
 
+### Music
+- The menu music is "Shadows of the Don" (`assets/audio/shadows-of-the-don.mp3`). It loops and plays at 40% volume, so it sits under the button sounds.
+- Browsers don't allow sound before the player interacts, so it fades in over 3 seconds after the first click or key press.
+- It pauses when the window is hidden or minimised.
+- It keeps playing on any screen built inside the menu page, such as an Options screen.
+- Change the track or its level with `sounds.music` and `sounds.musicVolume`.
+
+Volume controls for an Options screen (0 to 1, saved automatically for next time):
+```js
+CosaMenu.setMusicVolume(0.5);   CosaMenu.getMusicVolume();
+CosaMenu.setSfxVolume(0.8);     CosaMenu.getSfxVolume();
+CosaMenu.stopMusic(1500);       // fade out, e.g. when the game itself starts
+CosaMenu.playMusic(1500);       // fade back in
+```
+
 ### Runtime API
 ```js
 CosaMenu.setVisible("multiplayer", false);

@@ -94,9 +94,10 @@ window.MENU_CONFIG = {
     select: null,
     back:   null,
     error:  null,
-    music:  null,              // looping menu music
+    music:  "assets/audio/shadows-of-the-don.mp3",   // looping menu music
+    musicVolume: 0.4,          // background level: under the button sounds
     ambience: null,            // looping rain / bar ambience
-    volume: 0.7
+    volume: 0.7                // button sounds
   },
 
   /* ---------------- Background & effects ---------------- */
