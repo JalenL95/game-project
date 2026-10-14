@@ -1298,7 +1298,8 @@
   function frame(now) {
     const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
     last = now;
-    if (scene) {
+    // paused while another full screen (e.g. Options) covers the menu
+    if (scene && !scene.paused) {
       scene.update(dt);
       scene.draw();
     }
@@ -1411,6 +1412,13 @@
     },
 
     show, hide, toast, placeholder,
+
+    /* Building blocks for other screens (e.g. Options). */
+    fadeIn(ms) { return fadeIn(ms); },
+    fadeOut(ms) { return fadeOut(ms); },
+    sfx(name) { sfx(name); },
+    unlockAudio() { unlockAudio(); },
+    get stage() { return el.stage; },
 
     /* Volume controls for your Options screen (0 to 1, saved automatically). */
     getMusicVolume() { return levels.music; },

@@ -130,6 +130,37 @@ CosaMenu.stopMusic(1500);       // fade out, e.g. when the game itself starts
 CosaMenu.playMusic(1500);       // fade back in
 ```
 
+### Options screen
+The Options button opens a case file on a desk (`css/options.css`, `js/options.js`, `assets/options/desk.jpg`). It's built from your concept: the original is kept at `assets/options/concept-original.png`. The baked-in text was removed from the picture and rebuilt as working controls.
+
+| Row | Does |
+|---|---|
+| Audio Volume | button-sound volume (`CosaMenu.setSfxVolume`) |
+| Music Volume | menu music volume (`CosaMenu.setMusicVolume`); you hear it change live |
+| Subtitles | ON / OFF, saved for the game to read |
+| Display | 4:3 / 16:9, saved for the game to read |
+| Controller Setup | stamps "COMING SOON" on the page until you hook it up |
+| Save & Exit | saves and fades back to the main menu |
+
+Controls:
+- Keyboard: ↑ ↓ choose a row, ← → change the value, Enter picks, Esc goes back. Going back saves too.
+- Mouse: hover to choose a row, drag or click a bar, click ON/OFF or 4:3/16:9, scroll over a bar to change it, right-click to go back.
+
+The music keeps playing the whole time. Everything is saved between sessions.
+
+What moves:
+- The desk lamp hums and every so often stutters. The whole room dims with it, including the paper.
+- The cigarette in the ashtray smoulders, sending up a thin curling thread of smoke.
+- The smoke already painted in the picture drifts gently.
+
+For the game:
+```js
+CosaOptions.get();                         // { audioVolume, musicVolume, subtitles, display }
+CosaOptions.onChange((s) => { ... });      // runs whenever a setting changes
+CosaOptions.onControllerSetup(() => { openMyControlsScreen(); return true; });
+```
+Labels, the title and the volume step are in `menu.config.js` under `options`.
+
 ### Runtime API
 ```js
 CosaMenu.setVisible("multiplayer", false);

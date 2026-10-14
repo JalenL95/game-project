@@ -100,6 +100,23 @@ window.MENU_CONFIG = {
     volume: 0.7                // button sounds
   },
 
+  /* ---------------- Options screen ----------------
+     Opens from the "Options" button. The sheet lines up with the paper
+     in assets/options/desk.jpg, so keep labels about the same length. */
+  options: {
+    title: "Options",
+    labels: {
+      audio: "Audio Volume",          // button sounds
+      music: "Music Volume",
+      subtitles: "Subtitles",
+      display: "Display",
+      controller: "Controller Setup",
+      save: "Save & Exit"
+    },
+    volumeStep: 0.05,                  // how much one arrow press changes a volume
+    controllerToast: "Coming soon"     // stamped on the page until controls exist
+  },
+
   /* ---------------- Background & effects ---------------- */
   background: {
     image: "assets/background.jpg",   // still image: shown if the video can't play, and

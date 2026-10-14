@@ -1,0 +1,252 @@
+/* =====================================================================
+   COSA NOSTRA — OPTIONS SCREEN
+   A case-file sheet on the desk. Positions are on the 1280 x 720 stage
+   and line up with the blank paper in assets/options/desk.jpg.
+   ===================================================================== */
+
+@font-face { font-family: "Rokkitt"; font-weight: 100 900; font-display: block; src: url("../assets/fonts/Rokkitt.ttf") format("truetype"); }
+@font-face { font-family: "Covered By Your Grace"; font-display: block; src: url("../assets/fonts/CoveredByYourGrace.ttf") format("truetype"); }
+
+:root {
+  --opt-ink: #1f1b16;
+  --opt-gold: #a2823f;
+  --opt-gold-hi: #e9cf87;
+  --opt-red: #a92f27;
+  --opt-type: "Rokkitt", "Courier Prime", "Courier New", serif;
+  --opt-hand: "Covered By Your Grace", "Segoe Print", "Bradley Hand", cursive;
+}
+
+.options {
+  position: absolute;
+  inset: 0;
+  z-index: 45;              /* above the menu, below the fade (50) */
+  overflow: hidden;
+  background: #120c07;
+  font-family: var(--opt-type);
+  color: var(--opt-ink);
+}
+.options[hidden] { display: none; }
+
+.opt-scene {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1280px;
+  height: 720px;
+}
+
+/* the sheet of paper (matches the blank paper in the background) */
+.opt-sheet {
+  position: absolute;
+  left: 438px;
+  top: 188px;
+  width: 417px;
+  height: 414px;
+}
+
+/* ---------------- handwritten title ---------------- */
+.opt-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 2px;
+  margin: 0;
+  text-align: center;
+  font-family: var(--opt-hand);
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 60px;
+  letter-spacing: 0.04em;
+  color: #15120f;
+  -webkit-text-stroke: 0.7px #15120f;
+  mix-blend-mode: multiply;
+  clip-path: inset(0 100% 0 0);
+}
+.opt-title .cap { font-size: 64px; }
+.opt-title.is-written { clip-path: inset(0 0 0 0); transition: clip-path 0.9s cubic-bezier(0.55, 0.1, 0.35, 1); }
+
+.opt-underline {
+  position: absolute;
+  left: 104px;
+  top: 58px;
+  width: 210px;
+  height: 14px;
+  overflow: visible;
+  mix-blend-mode: multiply;
+}
+.opt-underline { clip-path: inset(0 100% 0 0); }
+.opt-underline path { fill: var(--opt-red); opacity: 0.92; }
+.opt-underline.is-drawn { clip-path: inset(0 -4px 0 0); transition: clip-path 0.45s cubic-bezier(0.6, 0, 0.3, 1) 0.75s; }
+
+/* ---------------- rows ---------------- */
+.opt-row {
+  position: absolute;
+  left: 57px;
+  width: 306px;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 26px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.45s ease, transform 0.5s ease;
+  transition-delay: calc(var(--i) * 70ms + 0.5s);
+}
+.options.is-open .opt-row { opacity: 1; transform: none; }
+
+.opt-row .ink { mix-blend-mode: multiply; }
+.opt-row.is-centered { text-align: center; }
+.opt-row .value { color: var(--opt-gold); display: inline-block; }
+/* on the gold plaque, values switch to a deeper gold so they stay readable */
+.opt-row.is-active .value,
+.opt-row.is-active .opt-choice.is-on { color: #6e4f17; }
+.opt-row .value.is-pop { animation: opt-pop 0.28s cubic-bezier(0.2, 1.6, 0.4, 1); }
+@keyframes opt-pop { 0% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+.opt-choice { cursor: pointer; transition: color 0.18s ease; }
+.opt-choice.is-on { color: var(--opt-gold); }
+.opt-choice:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+/* volume bars */
+.opt-bar {
+  position: relative;
+  height: 12px;
+  margin-top: 10px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #c9c2b2, #aaa292);
+  box-shadow:
+    inset 0 0 0 1px rgba(40, 32, 22, 0.85),
+    inset 0 2px 2px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+}
+.opt-bar .fill {
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  bottom: 1px;
+  width: 0;
+  border-radius: 2px 0 0 2px;
+  background:
+    linear-gradient(180deg, rgba(255, 246, 214, 0.45), rgba(255, 246, 214, 0) 45%, rgba(60, 40, 10, 0.18)),
+    linear-gradient(90deg, #6f5528 0%, #9a7a3c 30%, #c9a85e 70%, #ecd28c 100%);
+  transition: width 0.14s ease-out;
+}
+.opt-bar .fill.is-full { border-radius: 2px; }
+
+/* ---------------- selection plaque ---------------- */
+.opt-plaque {
+  position: absolute;
+  left: 40px;
+  width: 345px;
+  top: 0;
+  height: 42px;
+  border-radius: 7px;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 45%, rgba(255, 246, 215, 0.5), rgba(255, 246, 215, 0) 70%),
+    linear-gradient(180deg, #e0d4ae 0%, #d0c08f 45%, #b9a674 100%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(122, 96, 48, 0.75),
+    inset 0 2px 3px rgba(255, 250, 225, 0.6),
+    inset 0 -3px 6px rgba(110, 84, 36, 0.25),
+    0 2px 6px rgba(60, 40, 15, 0.25);
+  opacity: 0;
+  transition:
+    transform 0.32s cubic-bezier(0.22, 1.2, 0.36, 1),
+    height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease;
+  pointer-events: none;
+}
+.options.is-ready .opt-plaque { opacity: 1; }
+.opt-plaque.ignite { animation: opt-ignite 0.4s linear; }
+@keyframes opt-ignite {
+  0% { opacity: 0.25; } 15% { opacity: 1; } 25% { opacity: 0.45; } 40% { opacity: 1; } 55% { opacity: 0.75; } 70%, 100% { opacity: 1; }
+}
+.opt-plaque.blink { animation: opt-blink 0.11s steps(1, end) 4; }
+@keyframes opt-blink { 0% { opacity: 1; filter: brightness(1.25); } 50% { opacity: 0.15; } 100% { opacity: 1; } }
+
+/* gold pointer to the left of the plaque */
+.opt-arrow {
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  width: 34px;
+  height: 30px;
+  margin-top: -15px;
+  overflow: visible;
+  animation: opt-arrow 1.1s ease-in-out infinite;
+}
+@keyframes opt-arrow { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+
+/* "coming soon" rubber stamp */
+.opt-stamp {
+  position: absolute;
+  right: 6px;
+  top: 0;
+  padding: 3px 10px 1px;
+  border: 3px solid var(--opt-red);
+  border-radius: 4px;
+  font-family: var(--opt-type);
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  color: var(--opt-red);
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+  transform: rotate(-9deg) scale(1.7);
+  background: rgba(246, 240, 226, 0.55);
+  -webkit-mask-image: var(--stamp-grunge);
+  mask-image: var(--stamp-grunge);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+.opt-stamp.is-down {
+  animation: opt-stamp 1.9s ease forwards;
+}
+@keyframes opt-stamp {
+  0%   { opacity: 0; transform: rotate(-9deg) scale(1.7); }
+  12%  { opacity: 0.9; transform: rotate(-9deg) scale(0.96); }
+  18%  { transform: rotate(-9deg) scale(1); }
+  75%  { opacity: 0.9; }
+  100% { opacity: 0; transform: rotate(-9deg) scale(1); }
+}
+
+/* ---------------- key hints on the desk ---------------- */
+.opt-hints {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 676px;
+  display: flex;
+  justify-content: center;
+  gap: 26px;
+  opacity: 0;
+  transition: opacity 0.6s ease 0.9s;
+}
+.options.is-open .opt-hints { opacity: 1; }
+.opt-hints .hint {
+  font-family: var(--opt-type);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #ddd2bd;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* room light from the desk lamp: dims the whole screen when the lamp flickers */
+.opt-shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 120% 110% at 85% 15%, rgba(0, 0, 0, 0.55), #000 80%);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opt-arrow { animation: none; }
+  .opt-row { transition-delay: 0s; }
+}
