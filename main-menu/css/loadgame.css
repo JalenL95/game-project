@@ -208,35 +208,6 @@
 .options.is-ready .lg-clip { opacity: 1; }
 .lg-clip.is-hidden { opacity: 0 !important; }
 
-/* key hints written like the concept: [ENTER] SELECT  [ESC] BACK */
-.lg-hints {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 678px;
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  opacity: 0;
-  transition: opacity 0.6s ease 0.9s;
-}
-.options.is-open .lg-hints { opacity: 1; }
-.lg-hints button {
-  border: 0;
-  background: none;
-  padding: 2px 4px;
-  font-family: var(--opt-type);
-  font-size: 21px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #ddd2bd;
-  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
-  cursor: pointer;
-  outline: none;
-}
-.lg-hints button:hover, .lg-hints button.is-pressed { color: #fff3d6; }
-
 @media (prefers-reduced-motion: reduce) {
   .lg-card, .lg-back { transition-delay: 0s; }
 }

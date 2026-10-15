@@ -134,15 +134,21 @@
     sheet.append(backEl, pointer, clip, stamp);
 
     hintsEl = document.createElement("div");
-    hintsEl.className = "lg-hints";
-    hintsEl.innerHTML = '<button type="button" tabindex="-1" data-action="select">[Enter] Select</button>' +
-      '<button type="button" tabindex="-1" data-action="back">[Esc] Back</button>';
+    // same keycap hints as the main menu and Options
+    hintsEl.className = "opt-hints";
+    hintsEl.innerHTML = [
+      ['<kbd class="key">\u2191</kbd><kbd class="key">\u2193</kbd>', "Navigate", ""],
+      ['<kbd class="key">Enter</kbd>', "Select", "select"],
+      ['<kbd class="key">Esc</kbd>', "Back", "back"]
+    ].map(([keys, lab, act]) =>
+      `<button type="button" class="hint" tabindex="-1" data-action="${act}"><span class="hint-keys">${keys}</span><span class="hint-label">${lab}</span></button>`
+    ).join("");
     hintsEl.addEventListener("mousedown", (e) => e.preventDefault());
     hintsEl.addEventListener("click", (e) => {
-      const b = e.target.closest("button");
+      const b = e.target.closest(".hint");
       if (!b || busy) return;
       if (b.dataset.action === "select") activate();
-      else close();
+      else if (b.dataset.action === "back") close();
     });
 
     root.append(sheet, hintsEl);
@@ -307,12 +313,12 @@
       if (k === "F11" || k === "F12" || e.ctrlKey || e.metaKey || e.altKey) return;
       e.preventDefault();
       if (busy) return;
-      if (k === "ArrowUp" || k === "w" || k === "W" || (k === "Tab" && e.shiftKey)) select(index - 1);
-      else if (k === "ArrowDown" || k === "s" || k === "S" || k === "Tab") select(index + 1);
+      if (k === "ArrowUp" || k === "w" || k === "W" || (k === "Tab" && e.shiftKey)) { press("\u2191"); select(index - 1); }
+      else if (k === "ArrowDown" || k === "s" || k === "S" || k === "Tab") { press("\u2193"); select(index + 1); }
       else if (k === "Home") select(0);
       else if (k === "End") select(count() - 1);
-      else if (k === "Enter" || k === " ") { if (!e.repeat) { press("select"); activate(); } }
-      else if (k === "Escape" || k === "Backspace") { if (!e.repeat) { press("back"); close(); } }
+      else if (k === "Enter" || k === " ") { if (!e.repeat) { press("Enter"); activate(); } }
+      else if (k === "Escape" || k === "Backspace") { if (!e.repeat) { press("Esc"); close(); } }
     }, true);
 
     root.addEventListener("pointermove", (e) => {
@@ -347,11 +353,11 @@
     root.addEventListener("contextmenu", (e) => e.preventDefault());
   }
 
-  function press(action) {
-    const b = hintsEl.querySelector(`[data-action="${action}"]`);
-    if (!b) return;
-    b.classList.add("is-pressed");
-    setTimeout(() => b.classList.remove("is-pressed"), 130);
+  function press(keyText) {
+    const key = [...hintsEl.querySelectorAll(".key")].find((k) => k.textContent === keyText);
+    if (!key) return;
+    key.classList.add("is-pressed");
+    setTimeout(() => key.classList.remove("is-pressed"), 130);
   }
 
   /* =================================================================
