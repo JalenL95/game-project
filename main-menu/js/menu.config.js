@@ -117,6 +117,19 @@ window.MENU_CONFIG = {
     controllerToast: "Coming soon"     // stamped on the page until controls exist
   },
 
+  /* ---------------- Load Game screen ----------------
+     Three save slots. Your game saves with CosaSaves.save(slot, {...})
+     and loads with CosaLoad.onLoad(fn); see js/saves.js. */
+  loadGame: {
+    title: "Load Game",
+    backLabel: "Back to Main Menu",
+    emptyTitle: "Empty Slot",
+    emptyLine: "No family saved",
+    // Example families shown only while no real save exists, so you can
+    // see the screen during development. Set to false before release.
+    exampleSaves: true
+  },
+
   /* ---------------- Background & effects ---------------- */
   background: {
     image: "assets/background.jpg",   // still image: shown if the video can't play, and

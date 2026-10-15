@@ -161,6 +161,43 @@ CosaOptions.onControllerSetup(() => { openMyControlsScreen(); return true; });
 ```
 Labels, the title and the volume step are in `menu.config.js` under `options`.
 
+### Load Game screen
+The Load Game button opens the same case file and desk as Options (`css/loadgame.css`, `js/loadgame.js`). The concept is kept at `assets/options/concept-load-original.png`.
+
+- **Layout:** three save slots as index cards. Each card shows the family name, the Don, the in-game date, play time and a black-and-white photo. There are no chapters.
+- **Selection:** the selected card turns gold, and the paper clip and pointer move to it.
+- **Empty slots:** they read "EMPTY SLOT". Picking one shakes the card and stamps it "EMPTY".
+- **Loading:** picking a save blinks the card, fades to black, then hands the save to your game.
+- **Controls:** ↑ ↓ / mouse / wheel to choose, Enter or click to load, Esc / right-click / "Back to Main Menu" to return.
+- **Main menu button:** Load Game greys out when there are no saves. Example saves count as saves while they're switched on.
+
+The animated desk is shared with Options (`js/desk.js`), so the lamp and smoke carry on between the two screens.
+
+Saving and loading from the game:
+```js
+// save (slot 1-3)
+CosaSaves.save(1, {
+  family: "The Moretti Family",
+  don: "Don Salvatore",
+  date: "10/24/1947",          // in-game date
+  playTime: 31335,             // seconds, shown as 08:42:15
+  thumbnail: canvas.toDataURL("image/jpeg", 0.7),   // optional, keep it small
+  data: { /* your game state */ }
+});
+
+// load
+CosaLoad.onLoad((save, slot) => {
+  CosaMenu.stopMusic();
+  startGame(save.data);
+});
+
+CosaSaves.list(); CosaSaves.get(1); CosaSaves.remove(1); CosaSaves.clear();
+```
+
+Saves are stored in the browser's local storage on that computer, so keep thumbnails small, around 200px wide.
+
+Example saves (Moretti, Esposito, Russo) appear only while no real save exists. Turn them off with `loadGame.exampleSaves: false` before release.
+
 ### Runtime API
 ```js
 CosaMenu.setVisible("multiplayer", false);

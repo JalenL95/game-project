@@ -1,0 +1,242 @@
+/* =====================================================================
+   COSA NOSTRA — LOAD GAME SCREEN
+   Same desk and case file as Options (it reuses .options, .opt-title,
+   .opt-underline, .opt-arrow and .opt-stamp from options.css). Save
+   slots are index cards clipped to the sheet. Positions are on the
+   1280 x 720 stage, relative to the paper (.opt-sheet).
+   ===================================================================== */
+
+/* scroll flourishes either side of the title */
+.lg-flourish {
+  position: absolute;
+  top: 18px;
+  width: 58px;
+  height: 22px;
+  overflow: visible;
+  mix-blend-mode: multiply;
+  opacity: 0;
+  transition: opacity 0.6s ease 0.6s;
+}
+.lg-flourish path { fill: none; stroke: #2a241d; stroke-width: 1.4; stroke-linecap: round; }
+.lg-flourish.left { left: 40px; }
+.lg-flourish.right { right: 22px; transform: scaleX(-1); }
+.options.is-open .lg-flourish { opacity: 0.9; }
+
+/* ---------------- save cards ---------------- */
+.lg-card {
+  position: absolute;
+  left: 18px;
+  width: 380px;
+  height: 86px;
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 20px, rgba(84, 92, 110, 0.14) 20px 21px) 0 12px / 100% 100% no-repeat,
+    linear-gradient(180deg, #e9e0cb, #dcd1b8);
+  box-shadow:
+    inset 0 0 0 1px rgba(110, 92, 62, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.4),
+    0 2px 4px rgba(50, 35, 15, 0.28);
+  font-family: var(--opt-type);
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.45s ease, transform 0.5s ease;
+  transition-delay: calc(var(--i) * 90ms + 0.45s);
+}
+.options.is-open .lg-card { opacity: 1; transform: none; }
+
+/* the gold plaque the selected card turns into */
+.lg-card .lg-glow {
+  position: absolute;
+  inset: -2px;
+  border-radius: 4px;
+  background:
+    radial-gradient(ellipse 55% 75% at 38% 45%, rgba(255, 246, 212, 0.6), rgba(255, 246, 212, 0) 70%),
+    linear-gradient(180deg, #e9dcae 0%, #d8c48b 50%, #c4ac70 100%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(128, 100, 48, 0.8),
+    inset 0 2px 3px rgba(255, 250, 228, 0.7),
+    inset 0 -3px 6px rgba(110, 84, 36, 0.25),
+    0 0 14px rgba(255, 214, 140, 0.45),
+    0 3px 6px rgba(60, 40, 15, 0.3);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.lg-card.is-active .lg-glow { opacity: 1; }
+.lg-card.is-active .lg-glow.ignite { animation: opt-ignite 0.4s linear; }
+.lg-card.is-blinking .lg-glow { animation: opt-blink 0.11s steps(1, end) 4; }
+
+.lg-card .lg-text { position: absolute; inset: 0; mix-blend-mode: multiply; }
+.lg-title {
+  position: absolute;
+  left: 11px;
+  top: 9px;
+  width: 272px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 26px;
+  color: var(--opt-gold);
+  transition: color 0.2s ease;
+}
+.lg-card.is-active .lg-title { color: var(--opt-ink); }
+.lg-line {
+  position: absolute;
+  left: 37px;
+  width: 246px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 21px;
+  letter-spacing: -0.005em;
+  color: var(--opt-ink);
+}
+.lg-line.l2 { top: 38px; }
+.lg-line.l3 { top: 59px; }
+
+/* photo stuck to the card */
+.lg-thumb {
+  position: absolute;
+  right: 6px;
+  top: 5px;
+  width: 92px;
+  height: 75px;
+  background: #1a1612;
+  box-shadow: 0 0 0 2px #f4efe2, 0 2px 4px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+.lg-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(1) contrast(1.12) brightness(0.95);
+}
+.lg-thumb .no-photo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #8b8273;
+}
+
+/* empty slot */
+.lg-card.is-empty .lg-title { color: #9b9282; }
+.lg-card.is-empty .lg-line { color: #9b9282; }
+.lg-card.is-empty .lg-thumb { background: transparent; box-shadow: inset 0 0 0 1.5px rgba(120, 108, 88, 0.45); }
+.lg-card.is-shaking { animation: lg-shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+@keyframes lg-shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-5px); }
+  40%, 60% { transform: translateX(5px); }
+}
+
+/* "Back to main menu" */
+.lg-back {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 372px;
+  text-align: center;
+  font-family: var(--opt-type);
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 26px;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.45s ease 0.8s;
+}
+.options.is-open .lg-back { opacity: 1; }
+.lg-back span { position: relative; display: inline-block; padding: 6px 22px; mix-blend-mode: multiply; }
+.lg-back .lg-glow {
+  position: absolute;
+  left: 50%;
+  top: -7px;
+  width: 300px;
+  height: 40px;
+  margin-left: -150px;
+  border-radius: 7px;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% 45%, rgba(255, 246, 215, 0.5), rgba(255, 246, 215, 0) 70%),
+    linear-gradient(180deg, #e0d4ae 0%, #d0c08f 45%, #b9a674 100%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(122, 96, 48, 0.75),
+    inset 0 2px 3px rgba(255, 250, 225, 0.6),
+    0 2px 6px rgba(60, 40, 15, 0.25);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.lg-back.is-active .lg-glow { opacity: 1; }
+.lg-back.is-active .lg-glow.ignite { animation: opt-ignite 0.4s linear; }
+
+/* pointer + paper clip that follow the selection */
+.lg-pointer {
+  position: absolute;
+  left: -6px;
+  top: 0;
+  width: 34px;
+  height: 30px;
+  pointer-events: none;
+  z-index: 3;
+  transition: transform 0.34s cubic-bezier(0.22, 1.2, 0.36, 1), opacity 0.3s ease;
+  opacity: 0;
+}
+.options.is-ready .lg-pointer { opacity: 1; }
+.lg-pointer .opt-arrow { left: 0; top: 0; margin: 0; }
+.lg-clip {
+  position: absolute;
+  left: 58px;
+  top: 0;
+  width: 20px;
+  height: 62px;
+  z-index: 3;
+  pointer-events: none;
+  overflow: visible;
+  transition: transform 0.4s cubic-bezier(0.22, 1.15, 0.36, 1), opacity 0.25s ease;
+  filter: drop-shadow(1px 2px 1px rgba(0, 0, 0, 0.3));
+  opacity: 0;
+}
+.options.is-ready .lg-clip { opacity: 1; }
+.lg-clip.is-hidden { opacity: 0 !important; }
+
+/* key hints written like the concept: [ENTER] SELECT  [ESC] BACK */
+.lg-hints {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 678px;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  opacity: 0;
+  transition: opacity 0.6s ease 0.9s;
+}
+.options.is-open .lg-hints { opacity: 1; }
+.lg-hints button {
+  border: 0;
+  background: none;
+  padding: 2px 4px;
+  font-family: var(--opt-type);
+  font-size: 21px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ddd2bd;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+  outline: none;
+}
+.lg-hints button:hover, .lg-hints button.is-pressed { color: #fff3d6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-card, .lg-back { transition-delay: 0s; }
+}

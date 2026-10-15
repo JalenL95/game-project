@@ -7,6 +7,7 @@
   <link rel="preload" href="assets/background.jpg" as="image">
   <link rel="stylesheet" href="css/menu.css">
   <link rel="stylesheet" href="css/options.css">
+  <link rel="stylesheet" href="css/loadgame.css">
 </head>
 <body>
   <div id="viewport">
@@ -64,7 +65,10 @@
   <script src="js/menu.config.js"></script>
   <script src="js/scene.js"></script>
   <script src="js/menu.js"></script>
+  <script src="js/desk.js"></script>
+  <script src="js/saves.js"></script>
   <script src="js/options.js"></script>
+  <script src="js/loadgame.js"></script>
   <script>
     /* ---------------------------------------------------------------
        HOOK YOUR GAME UP HERE
@@ -74,16 +78,17 @@
        to bring the menu back afterwards.
 
        Actions with no handler show the "Coming soon" toast instead.
-       The two below are placeholders: replace them with your game.
+       Options and Load Game have their own screens (options.js,
+       loadgame.js). Start Game below is a placeholder.
+
+       Loading a save:   CosaLoad.onLoad((save) => { ... save.data ... });
+       Saving the game:  CosaSaves.save(1, { family, don, date, playTime, thumbnail, data });
        --------------------------------------------------------------- */
     CosaMenu.on("start-game", function () {
       // e.g. window.location.href = "game.html";
       return CosaMenu.placeholder("Start Game", "Your game starts here.");
     });
 
-    CosaMenu.on("load-game", function () {
-      return CosaMenu.placeholder("Load Game", "Your save slots go here.");
-    });
   </script>
 </body>
 </html>

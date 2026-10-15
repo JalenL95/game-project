@@ -1311,6 +1311,7 @@
      Public API
      ================================================================= */
   function rerender() {
+    if (!state.stack.length) return;   // menu not built yet: the change is picked up when it is
     const sel = state.entries[state.index];
     // drop pages whose parent item vanished
     while (state.stack.length > 1) {
